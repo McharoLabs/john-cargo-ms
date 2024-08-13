@@ -15,6 +15,7 @@ import { Label } from "./ui/label";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { LoginFormSchemaType } from "@/lib/types";
 import { loginAction } from "@/actions/auth.action";
+import Loader from "./loader";
 
 const LoginForm = () => {
   const {
@@ -25,8 +26,10 @@ const LoginForm = () => {
     formState: { errors },
   } = useForm<LoginFormSchemaType>();
   const [detail, setDetail] = React.useState<string | null>(null);
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   const onSubmit: SubmitHandler<LoginFormSchemaType> = async (data) => {
+    setIsLoading(true);
     const res = await loginAction(data);
 
     if (res && res.success === false) {
@@ -43,11 +46,13 @@ const LoginForm = () => {
         setDetail("An unexpected error occurred.");
       }
 
+      setIsLoading(false);
       return;
     }
 
     setDetail("");
     reset({ email: "", password: "" });
+    setIsLoading(false);
   };
 
   return (
@@ -89,8 +94,8 @@ const LoginForm = () => {
             </div>
           </CardContent>
           <CardFooter>
-            <Button className="w-full" type="submit">
-              Sign in
+            <Button className="w-full" type="submit" disabled={isLoading}>
+              {isLoading ? <Loader message="Validating..." /> : "Sign in"}
             </Button>
           </CardFooter>
         </form>

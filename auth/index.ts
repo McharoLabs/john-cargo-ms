@@ -38,7 +38,7 @@ export const authOptions: NextAuthConfig = {
     }),
   ],
   secret: process.env.AUTH_SECRET,
-  pages: { signIn: "/login" },
+  pages: { signIn: "/auth/signin", verifyRequest: "/auth/verify-request" },
   callbacks: {
     jwt: ({ token, user }) => {
       if (user) {

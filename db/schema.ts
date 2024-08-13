@@ -17,6 +17,7 @@ export const userTable = pgTable("users", {
   lastName: varchar("last_name", { length: 50 }).notNull(),
   email: varchar("email", { length: 255 }).unique().notNull(),
   contact: varchar("contact", { length: 50 }).notNull(),
+  isSuperUser: boolean("is_super_user").default(false).notNull(),
   password: varchar("password", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")

@@ -1,12 +1,18 @@
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
 import { NextResponse } from "next/server";
+import AutoSignOut from "./app/auth/signout/page";
 
-const { auth } = NextAuth(authConfig);
+const { auth, signOut } = NextAuth(authConfig);
 
 export default auth((req) => {
   const reqUrl = new URL(req.url);
-  if (!req.auth && reqUrl.pathname !== "/" && reqUrl.pathname !== "/login") {
+
+  if (reqUrl.pathname === "/") {
+    return NextResponse.redirect(new URL("/auth/signin", req.url));
+  }
+
+  if (!req.auth && reqUrl.pathname !== "/auth/signin") {
     return NextResponse.redirect(
       new URL(
         `/api/auth/signin?callbackUrl=${encodeURIComponent(reqUrl?.pathname)}`,
@@ -14,6 +20,16 @@ export default auth((req) => {
       )
     );
   }
+
+  if (req.auth?.user.isSuperUser && reqUrl.pathname.startsWith("/home")) {
+    AutoSignOut();
+    console.log(req.auth?.user);
+  }
+
+  if (!req.auth?.user.isSuperUser && reqUrl.pathname.startsWith("/manage")) {
+    console.log(req.auth?.user);
+  }
+
   return NextResponse.next();
 });
 
