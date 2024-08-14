@@ -1,9 +1,8 @@
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
 import { NextResponse } from "next/server";
-import AutoSignOut from "./app/auth/signout/page";
 
-const { auth, signOut } = NextAuth(authConfig);
+const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
   const reqUrl = new URL(req.url);
@@ -22,12 +21,11 @@ export default auth((req) => {
   }
 
   if (req.auth?.user.isSuperUser && reqUrl.pathname.startsWith("/home")) {
-    AutoSignOut();
-    console.log(req.auth?.user);
+    return NextResponse.redirect(new URL("/auth/401", req.url));
   }
 
   if (!req.auth?.user.isSuperUser && reqUrl.pathname.startsWith("/manage")) {
-    console.log(req.auth?.user);
+    return NextResponse.redirect(new URL("/auth/401", req.url));
   }
 
   return NextResponse.next();

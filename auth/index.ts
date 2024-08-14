@@ -12,7 +12,6 @@ export const authOptions: NextAuthConfig = {
       name: "credentials",
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          console.log("Credentials not provided");
           return null;
         }
 
@@ -21,6 +20,10 @@ export const authOptions: NextAuthConfig = {
         });
 
         if (!user || !user.password) {
+          return null;
+        }
+
+        if (user.isSuperUser === null) {
           return null;
         }
 
@@ -33,7 +36,10 @@ export const authOptions: NextAuthConfig = {
           return null;
         }
 
-        return user;
+        return {
+          ...user,
+          isSuperUser: user.isSuperUser,
+        };
       },
     }),
   ],

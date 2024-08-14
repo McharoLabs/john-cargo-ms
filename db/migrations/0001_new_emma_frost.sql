@@ -1,1 +1,0 @@
-ALTER TABLE "users" ADD COLUMN "is_super_user" boolean DEFAULT false NOT NULL;

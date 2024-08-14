@@ -8,8 +8,10 @@ const VerifyRequest = async () => {
     redirect("/auth/signin");
   } else if (session.user.isSuperUser) {
     redirect("/manage/dashboard");
-  } else {
+  } else if (!session.user.isSuperUser) {
     redirect("/home/dashboard");
+  } else {
+    redirect("/auth/401");
   }
 };
 

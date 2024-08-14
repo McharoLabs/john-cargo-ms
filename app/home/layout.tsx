@@ -1,18 +1,17 @@
-import { auth } from "@/auth";
+import TopAsideBar from "@/components/top-aside-bar";
 import React from "react";
 
-export default async function ManageLayout({
+export default async function HomeLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
-
   return (
-    <div className="min-h-screen bg-blue-500">
-      <nav>gygjhghj</nav>
-      <aside></aside>
-      {children}
+    <div>
+      <TopAsideBar />
+      <div className="p-4 sm:ml-64 ">
+        <div className="p-4 rounded-lg  mt-14 ">{children}</div>
+      </div>
     </div>
   );
 }

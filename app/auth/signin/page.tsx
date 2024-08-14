@@ -1,14 +1,16 @@
 import LoginForm from "@/components/login-form.client";
 import { db } from "@/db";
 import { userTable } from "@/db/schema";
+import { generateTimestampCode } from "@/lib/utils";
 import React from "react";
 
 const LoginPage = async () => {
   // await db.insert(userTable).values({
-  //   firstName: "Test",
-  //   lastName: "User",
-  //   email: "test@gmail.com",
+  //   firstName: "Godfrey",
+  //   lastName: "Mcharo",
+  //   email: "mcharo@gmail.com",
   //   contact: "0717251140",
+  //   codeNumber: (await generateTimestampCode()).codeNumber,
   //   password: "$2a$10$NPDrzyC20Bi2jmV8fWURpeL8DTDJiWJq2m225WllIiTwr.KLtiMBK",
   // });
   return (

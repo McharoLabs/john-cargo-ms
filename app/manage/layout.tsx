@@ -1,15 +1,17 @@
+import TopAsideBar from "@/components/top-aside-bar";
 import React from "react";
 
-export default function ManageLayout({
+export default async function ManageLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <div>
-      <nav></nav>
-      <aside></aside>
-      {children}
+      <TopAsideBar />
+      <div className="p-4 sm:ml-64 ">
+        <div className="p-4 rounded-lg  mt-14 ">{children}</div>
+      </div>
     </div>
   );
 }
