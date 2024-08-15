@@ -215,7 +215,7 @@ const TopAsideBar = () => {
                 } hover:bg-gray-100 group`}
               >
                 <svg
-                  className="w-5 h-5 text-blue-500 transition duration-75 group-hover:text-blue-700"
+                  className="w-6 h-6 text-blue-500 transition duration-75 group-hover:text-blue-700"
                   aria-hidden="true"
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -225,97 +225,12 @@ const TopAsideBar = () => {
                 >
                   <path
                     stroke="currentColor"
-                    d="M5 3h14v14H5V3zm2 2v10h10V5H7z"
+                    stroke-width="2"
+                    d="M3 13h1v6H3v-6zm16 0h1v6h-1v-6zM4 9h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2zM6 15h1v1H6v-1zM10 15h1v1h-1v-1zM14 15h1v1h-1v-1zM18 15h1v1h-1v-1zM4 7v2h16V7H4zM4 11v2h16v-2H4z"
                   />
                 </svg>
 
-                <span className="ms-3">Products</span>
-              </Link>
-            </li>
-
-            <li>
-              <Link
-                href="/manage/warehouse"
-                className={`${
-                  session?.user.isSuperUser ? "flex" : "hidden"
-                } items-center p-2 text-gray-900 rounded-lg  ${
-                  pathname === "/manage/warehouse" ? "bg-gray-100" : ""
-                } hover:bg-gray-100 group`}
-              >
-                <svg
-                  className="w-5 h-5 text-blue-500 transition duration-75 group-hover:text-blue-700"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    d="M4 4h16v2H4V4zm0 4h16v2H4V8zm0 4h16v2H4v-2zm0 4h16v2H4v-2z"
-                  />
-                </svg>
-
-                <span className="ms-3">WareHouse</span>
-              </Link>
-            </li>
-
-            <li>
-              <Link
-                href={`${
-                  session?.user.isSuperUser
-                    ? "/manage/requests"
-                    : "/home/requests"
-                }`}
-                className={`flex items-center p-2 text-gray-900 rounded-lg  ${
-                  pathname === "/manage/t-requests" ? "bg-gray-100" : ""
-                } hover:bg-gray-100 group`}
-              >
-                <svg
-                  className="w-5 h-5 text-blue-500 transition duration-75 group-hover:text-blue-700"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    d="M5 12l5 5 5-5m-5 5V3m-7 6h14v6H6v-6z"
-                  />
-                </svg>
-
-                <span className="ms-3">Requests</span>
-              </Link>
-            </li>
-
-            <li>
-              <Link
-                href="/manage/users"
-                className={`${
-                  session?.user.isSuperUser ? "flex" : "hidden"
-                } items-center p-2 text-gray-900 rounded-lg  ${
-                  pathname === "/manage/history" ? "bg-gray-100" : ""
-                } hover:bg-gray-100 group`}
-              >
-                <svg
-                  className="w-5 h-5 text-blue-500 transition duration-75 group-hover:text-blue-700"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    d="M3 3h18v18H3V3zm6 4h6v2H9V7zm0 4h6v2H9v-2zm0 4h6v2H9v-2z"
-                  />
-                </svg>
-
-                <span className="ms-3">History</span>
+                <span className="ms-3">Cargo</span>
               </Link>
             </li>
           </ul>

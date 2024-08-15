@@ -1,7 +1,7 @@
 "use server";
 import { staffTable, userTable } from "@/db/schema";
 import { db } from "@/db";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { auth, signIn } from "@/auth";
 import { AuthError } from "next-auth";
 import { LoginFormSchema, LoginFormSchemaType } from "@/lib/types";
@@ -36,10 +36,6 @@ export async function loginAction(formData: LoginFormSchemaType) {
 }
 
 export async function findUserByEmail({ email }: { email: string }) {
-  // const user = await db.query.userTable.findFirst({
-  //   where: eq(userTable.email, email.toLowerCase()),
-  // });
-
   const u = await db
     .select({
       userId: userTable.userId,
@@ -52,7 +48,9 @@ export async function findUserByEmail({ email }: { email: string }) {
     .from(userTable)
     .leftJoin(staffTable, eq(userTable.userId, staffTable.staffId))
     .where(eq(userTable.email, email.toLowerCase()));
+
   const user = u[0];
-  console.log(user);
+
   return user;
 }
+

@@ -14,5 +14,7 @@ declare module "next-auth" {
   interface User extends DefaultUser {
     isSuperUser?: boolean;
     userId?: string;
+    firstName?: string;
+    lastName?: string;
   }
 }

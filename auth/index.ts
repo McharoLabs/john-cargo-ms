@@ -52,7 +52,8 @@ export const authOptions: NextAuthConfig = {
           ...token,
           id: user.userId,
           isSuperUser: user.isSuperUser,
-          name: user.name,
+          name: user.firstName?.concat(" ").concat(user.lastName!),
+
           email: user.email,
         };
       }
