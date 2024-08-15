@@ -57,10 +57,7 @@ const TopAsideBar = () => {
                 </svg>
               </button>
               <a href="" className="flex ms-2 md:me-24">
-                <img src="/favicon.ico" className="h-8 me-3" alt="IMS Logo" />
-                <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap text-gray-900">
-                  IMS
-                </span>
+                <img src="/favicon.ico" className="h-11 me-3" alt="IMS Logo" />
               </a>
             </div>
 

@@ -10,7 +10,9 @@ export default async function ManageLayout({
     <div>
       <TopAsideBar />
       <div className="p-4 sm:ml-64 ">
-        <div className="p-4 rounded-lg  mt-14 flex place-content-center">{children}</div>
+        <div className="p-4 rounded-lg  mt-14 flex place-content-center">
+          {children}
+        </div>
       </div>
     </div>
   );

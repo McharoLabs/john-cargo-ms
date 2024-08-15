@@ -92,3 +92,26 @@ export async function createUser(data: RegistrationSchemaType) {
     throw error;
   }
 }
+
+export async function users() {
+  try {
+    const us = await db
+      .select({
+        userId: userTable.userId,
+        codeNumber: userTable.codeNumber,
+        firstName: userTable.firstName,
+        lastName: userTable.lastName,
+        email: userTable.email,
+        contact: userTable.contact,
+        createdAt: userTable.createdAt,
+        isStaff: staffTable.staffId,
+      })
+      .from(userTable)
+      .leftJoin(staffTable, eq(userTable.userId, staffTable.staffId))
+      .orderBy(desc(userTable.codeNumber));
+
+    return us;
+  } catch (error) {
+    throw error;
+  }
+}
