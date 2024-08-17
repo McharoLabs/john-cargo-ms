@@ -100,39 +100,7 @@ const CargoClientForm = () => {
   }));
 
   const onSubmit: SubmitHandler<CargoFormSchemaType> = async (data) => {
-    console.log(form.getValues().costPerKg);
-    console.log(data);
     setIsConfirmDialogOpen(true);
-    // setIsLoading(true);
-    // try {
-    //   setIsLoading(false);
-    //   const res = await addCargo(data);
-    //   setIsLoading(false);
-
-    //   if (res && res.success === false) {
-    //     toast({
-    //       title: "Error",
-    //       description: "An error occurred while saving the cargo data.",
-    //       variant: "destructive",
-    //     });
-    //     return;
-    //   }
-
-    //   toast({
-    //     title: "Success",
-    //     description: "Cargo data has been saved successfully.",
-
-    //     className: "bg-green-500 text-white",
-    //   });
-    //   // form.reset();
-    // } catch (error) {
-    //   setIsLoading(false);
-    //   console.error(error);
-    //   toast({
-    //     title: "Error",
-    //     description: "An unexpected error occurred.",
-    //   });
-    // }
   };
 
   const handleContinue = async () => {
