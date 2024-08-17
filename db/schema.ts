@@ -12,7 +12,6 @@ import {
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm/sql";
 
-
 export const userTable = pgTable("users", {
   userId: uuid("user_id").primaryKey().defaultRandom(),
   codeNumber: varchar("code_number", { length: 50 }).unique().notNull(),
@@ -67,9 +66,9 @@ export const cargoTable = pgTable("cargo", {
     scale: 2,
   }).notNull(),
   amountPaid: decimal("amount_paid", { precision: 10, scale: 2 }).notNull(),
-  creditAmount: decimal("credit_amount", { precision: 10, scale: 2 }).notNull(),
-  outstanding: decimal("outstanding", { precision: 10, scale: 2 }).notNull(),
-  balance: decimal("balance", { precision: 10, scale: 2 }).notNull(),
+  creditAmount: decimal("credit_amount", { precision: 10, scale: 2 }),
+  outstanding: decimal("outstanding", { precision: 10, scale: 2 }),
+  balance: decimal("balance", { precision: 10, scale: 2 }),
   status: cargoStatusEnum("status").notNull().default("Not Paid"),
   shipped: boolean("shipped").default(false).notNull(),
   received: boolean("received").default(false).notNull(),

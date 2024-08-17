@@ -3,7 +3,6 @@ import Credentials from "next-auth/providers/credentials";
 import type { DefaultSession, NextAuthConfig } from "next-auth";
 import { compare } from "bcrypt-ts";
 import { findUserByEmail } from "@/actions/auth.action";
-
 export const BASE_PATH = "/api/auth";
 
 export const authOptions: NextAuthConfig = {
@@ -53,7 +52,6 @@ export const authOptions: NextAuthConfig = {
           id: user.userId,
           isSuperUser: user.isSuperUser,
           name: user.firstName?.concat(" ").concat(user.lastName!),
-
           email: user.email,
         };
       }

@@ -17,7 +17,13 @@ const TopAsideBar = () => {
 
   const [isSidebarOpen, setIsSidebarOpen] = React.useState<boolean>(false);
   const [isDropdownOpen, setIsDropdownOpen] = React.useState<boolean>(false);
+  const [isNavDropdownOpen, setIsNavDropdownOpen] =
+    React.useState<boolean>(false);
   const pathname = usePathname();
+
+  const toggleNavDropdown = () => {
+    setIsNavDropdownOpen(!isNavDropdownOpen);
+  };
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -26,8 +32,6 @@ const TopAsideBar = () => {
   const toggleDropdownUserBar = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
-
-  console.log(pathname);
 
   return (
     <div>
@@ -202,14 +206,41 @@ const TopAsideBar = () => {
 
             <li>
               <Link
-                href={`${
-                  session?.user.isSuperUser
-                    ? "/manage/products"
-                    : "/home/products"
-                }`}
-                className={`flex items-center p-2 text-gray-900 rounded-lg  ${
-                  pathname === "/manage/products" ? "bg-gray-100" : ""
+                href="/home/customers"
+                className={`${
+                  !session?.user.isSuperUser ? "flex" : "hidden"
+                } items-center p-2 text-gray-900 rounded-lg  ${
+                  pathname === "/home/customers" ? "bg-gray-100" : ""
                 } hover:bg-gray-100 group`}
+              >
+                <svg
+                  className="w-5 h-5 text-blue-500 transition duration-75 group-hover:text-blue-700"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
+                  />
+                </svg>
+
+                <span className="ms-3">Customers</span>
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                onClick={toggleNavDropdown}
+                className={` ${
+                  session?.user.isSuperUser ? "hidden" : "flex"
+                } items-center p-2 text-gray-900 rounded-lg  ${
+                  pathname === "/home/cargo" ? "bg-gray-100" : ""
+                } hover:bg-gray-100 group`}
+                href={""}
               >
                 <svg
                   className="w-6 h-6 text-blue-500 transition duration-75 group-hover:text-blue-700"
@@ -227,8 +258,45 @@ const TopAsideBar = () => {
                   />
                 </svg>
 
-                <span className="ms-3">Cargo</span>
+                <span className="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">
+                  Cargo
+                </span>
+
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  className="lucide lucide-chevron-down"
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
               </Link>
+              <ul
+                className={`py-2 space-y-2 ${
+                  isNavDropdownOpen ? "block" : "hidden"
+                }`}
+              >
+                <Link
+                  href={`${"/home/cargo/new-cargo"}`}
+                  onClick={toggleNavDropdown}
+                  className={`flex items-center p-2 pl-8 text-gray-900 rounded-lg hover:bg-gray-100 group`}
+                >
+                  <span className="ms-3">New Cargo</span>
+                </Link>
+                <Link
+                  href={`${"/home/cargo/all-cargo"}`}
+                  onClick={toggleNavDropdown}
+                  className={`flex items-center p-2 pl-8 text-gray-900 rounded-lg hover:bg-gray-100 group`}
+                >
+                  <span className="ms-3">All Cargo</span>
+                </Link>
+              </ul>
             </li>
           </ul>
         </div>

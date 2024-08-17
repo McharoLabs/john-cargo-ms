@@ -1,31 +1,34 @@
-import React from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import { RotateCcw, Search } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toggle } from "@/components/ui/toggle";
 import NewUserClientForm from "@/components/new-user-form.client";
-import { users } from "@/actions/user-actions";
 import UsersClientTable from "@/components/users-table.client";
+import { users } from "@/actions/user-actions";
+import { User } from "@/lib/types";
 
-const UsersPage = async () => {
-  const u = await users();
+const UsersPage = () => {
+  const [userData, setUserData] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  
+  const fetchUsers = async () => {
+    setLoading(true);
+    const data = await users();
+    setUserData(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
   return (
     <div className="max-w-7xl w-full space-y-10">
-      <NewUserClientForm
-        
-      />
+      <NewUserClientForm />
 
       <Tabs defaultValue="all">
         <div className="flex items-center">
@@ -35,7 +38,11 @@ const UsersPage = async () => {
             <TabsTrigger value="customers">Customers</TabsTrigger>
           </TabsList>
           <div className="ml-auto flex items-center gap-2">
-            <Toggle variant="outline" aria-label="Toggle italic">
+            <Toggle
+              variant="outline"
+              aria-label="Refresh users"
+              onClick={fetchUsers}
+            >
               <RotateCcw className="h-4 w-4" />
             </Toggle>
           </div>
@@ -53,7 +60,11 @@ const UsersPage = async () => {
               </div>
             </CardHeader>
             <CardContent>
-              <UsersClientTable data={u} />
+              {loading ? (
+                <p>Loading...</p>
+              ) : (
+                <UsersClientTable data={userData} />
+              )}
             </CardContent>
           </Card>
         </TabsContent>

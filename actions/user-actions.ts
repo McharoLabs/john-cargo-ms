@@ -1,7 +1,7 @@
 "use server";
 import { staffTable, userTable } from "@/db/schema";
 import { db } from "@/db";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import { RegistrationSchema, RegistrationSchemaType } from "@/lib/types";
 import { genSaltSync, hashSync } from "bcrypt-ts";
 
@@ -115,3 +115,24 @@ export async function users() {
     throw error;
   }
 }
+
+export const searchCustomer = async (search: string = "") => {
+  try {
+    const searchTerm = `%${search.toLowerCase()}%`;
+
+    const matchingCustomers = await db
+      .select({
+        codeNumber: userTable.codeNumber,
+        name: sql`${userTable.firstName} || ' ' || ${userTable.lastName} AS name`,
+      })
+      .from(userTable)
+      .where(
+        sql`${userTable.firstName} || ' ' || ${userTable.lastName} ILIKE ${searchTerm}`
+      )
+      .orderBy(desc(userTable.codeNumber));
+
+    return matchingCustomers;
+  } catch (error) {
+    throw error;
+  }
+};

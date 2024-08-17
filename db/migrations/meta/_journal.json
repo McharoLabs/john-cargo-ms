@@ -15,6 +15,20 @@
       "when": 1723622948749,
       "tag": "0001_confused_calypso",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1723792842483,
+      "tag": "0002_striped_black_cat",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1723924188917,
+      "tag": "0003_funny_skullbuster",
+      "breakpoints": true
     }
   ]
 }

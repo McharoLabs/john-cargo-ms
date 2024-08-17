@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { STATUS } from "./enum";
 
 export const LoginFormSchema = z.object({
   email: z.string().trim().email({ message: "Invalid email" }),
@@ -29,6 +30,40 @@ export const RegistrationSchema = z.object({
 });
 export type RegistrationSchemaType = z.infer<typeof RegistrationSchema>;
 
+export const CargoFormSchema = z.object({
+  codeNumber: z.string().min(1, "Please select a customer"),
+  postingDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Invalid date format",
+  }),
+  totalBox: z.string().refine((val) => !isNaN(parseFloat(val)), {
+    message: "totalBox must be a valid number",
+  }),
+  totalWeight: z.string().refine((val) => !isNaN(parseFloat(val)), {
+    message: "totalWeight must be a valid number",
+  }),
+  costPerKg: z.string().refine((val) => !isNaN(parseFloat(val)), {
+    message: "costPerKg must be a valid number",
+  }),
+  totalShipmentUSD: z.string().optional(),
+  exchangeRate: z.string().refine((val) => !isNaN(parseFloat(val)), {
+    message: "exchangeRate must be a valid number",
+  }),
+  totalShipmentTshs: z.string().optional(),
+  amountPaid: z.string().refine((val) => !isNaN(parseFloat(val)), {
+    message: "amountPaid must be a valid number",
+  }),
+  creditAmount: z.string().optional().optional(),
+  outstanding: z.string().optional(),
+  balance: z.string().optional(),
+  status: z.enum([STATUS.NOT_PAID, STATUS.PARTIALLY_PAID, STATUS.PAID], {
+    message: "Select cargo status",
+  }),
+  shipped: z.boolean().default(false),
+  received: z.boolean().default(false),
+});
+
+export type CargoFormSchemaType = z.infer<typeof CargoFormSchema>;
+
 export interface User {
   userId: string;
   codeNumber: string;
@@ -38,4 +73,14 @@ export interface User {
   contact: string;
   createdAt: Date;
   isStaff: string | null;
+}
+
+export type SearchCustomerType = {
+  codeNumber: string;
+  name: unknown;
+};
+
+export interface SelectOption {
+  value: string;
+  label: string;
 }
