@@ -84,3 +84,37 @@ export interface SelectOption {
   value: string;
   label: string;
 }
+
+interface Cargo {
+  cargoId: string;
+  codeNumber: string;
+  postingDate: Date;
+  totalBox: string;
+  totalWeight: string;
+  costPerKg: string;
+  totalShipmentUSD: string;
+  exchangeRate: string;
+  totalShipmentTshs: string;
+  amountPaid: string;
+  creditAmount: string | null;
+  outstanding: string | null;
+  balance: string | null;
+  status: string;
+  shipped: boolean;
+  received: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface Customer {
+  codeNumber: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  contact: string;
+}
+
+export interface CargoWithCustomer {
+  cargo: Cargo;
+  users: Customer;
+}

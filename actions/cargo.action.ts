@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { cargoTable } from "@/db/schema";
+import { cargoTable, userTable } from "@/db/schema";
 import { CargoFormSchema, CargoFormSchemaType } from "@/lib/types";
 import { desc, eq } from "drizzle-orm";
 
@@ -68,6 +68,28 @@ export const addCargo = async (data: CargoFormSchemaType) => {
     };
     await db.insert(cargoTable).values(cargoData);
     return { success: true, detail: "Cargo successfully added" };
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchCargos = async () => {
+  try {
+    const result = await db
+      .select({
+        cargo: cargoTable,
+        users: {
+          codeNumber: userTable.codeNumber,
+          firstName: userTable.firstName,
+          lastName: userTable.lastName,
+          email: userTable.email,
+          contact: userTable.contact,
+        },
+      })
+      .from(cargoTable)
+      .innerJoin(userTable, eq(cargoTable.codeNumber, userTable.codeNumber));
+
+    return result;
   } catch (error) {
     throw error;
   }

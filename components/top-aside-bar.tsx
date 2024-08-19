@@ -155,7 +155,7 @@ const TopAsideBar = () => {
           <ul className="space-y-2 font-medium">
             <li>
               <Link
-                href={`${session?.user.isSuperUser ? "/manage" : "/home"}`}
+                href={`${session?.user.isSuperUser ? "/manage/dashboard" : "/home/dashboard"}`}
                 className={`flex items-center p-2 text-gray-900 rounded-lg  ${
                   pathname === "/manage"
                     ? "bg-gray-100"
