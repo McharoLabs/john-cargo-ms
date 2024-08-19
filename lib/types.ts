@@ -106,12 +106,12 @@ interface Cargo {
   updatedAt: Date;
 }
 
-interface Customer {
+export interface Customer {
   codeNumber: string;
-  firstName: string;
-  lastName: string;
+  name: unknown;
   email: string;
   contact: string;
+  createdAt: Date;
 }
 
 export interface CargoWithCustomer {

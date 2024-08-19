@@ -9,11 +9,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -30,10 +28,19 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ChevronsUpDown, Plus, X } from "lucide-react";
-import { revalidatePath } from "next/cache";
+import { ChevronsUpDown } from "lucide-react";
 
-const NewUserClientForm = () => {
+type NewUserClientFormProps = {
+  title: string;
+  isStaff: boolean;
+  callback: () => void;
+};
+
+const NewUserClientForm: React.FC<NewUserClientFormProps> = ({
+  isStaff,
+  callback,
+  title,
+}) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
   const { toast } = useToast();
@@ -42,7 +49,7 @@ const NewUserClientForm = () => {
     defaultValues: {
       firstName: "",
       lastName: "",
-      isStaff: false,
+      isStaff: isStaff,
     },
   });
 
@@ -86,7 +93,7 @@ const NewUserClientForm = () => {
         contact: "",
         isStaff: false,
       });
-      revalidatePath("/manage/users");
+      callback();
     } catch (error) {
       setIsLoading(false);
 
@@ -99,7 +106,7 @@ const NewUserClientForm = () => {
         <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-full">
           <div className="flex items-center justify-between space-x-4 px-4">
             <CardHeader>
-              <CardTitle className="text-xl">Add New User</CardTitle>
+              <CardTitle className="text-xl">{title}</CardTitle>
               <CardDescription>
                 Enter user information to create an account
               </CardDescription>
@@ -194,27 +201,6 @@ const NewUserClientForm = () => {
                       />
                     </div>
                   </div>
-
-                  <FormField
-                    control={form.control}
-                    name="isStaff"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                          <FormLabel className="text-base">Staff</FormLabel>
-                          <FormDescription>
-                            Marked staff, will have an access to the system
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
 
                   <Button
                     className="w-full lg:w-1/2 justify-self-center"

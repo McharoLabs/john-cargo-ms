@@ -1,7 +1,7 @@
 "use server";
 import { staffTable, userTable } from "@/db/schema";
 import { db } from "@/db";
-import { desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import { RegistrationSchema, RegistrationSchemaType } from "@/lib/types";
 import { genSaltSync, hashSync } from "bcrypt-ts";
 
@@ -93,21 +93,50 @@ export async function createUser(data: RegistrationSchemaType) {
   }
 }
 
-export async function users() {
+export async function fetchStaffs(search: string = "") {
   try {
-    const us = await db
+    const searchTerm = `%${search.toLowerCase()}%`;
+
+    const staffUsers = await db
       .select({
-        userId: userTable.userId,
         codeNumber: userTable.codeNumber,
-        firstName: userTable.firstName,
-        lastName: userTable.lastName,
+        name: sql`${userTable.firstName} || ' ' || ${userTable.lastName} AS name`,
         email: userTable.email,
         contact: userTable.contact,
         createdAt: userTable.createdAt,
-        isStaff: staffTable.staffId,
+      })
+      .from(userTable)
+      .innerJoin(staffTable, eq(userTable.userId, staffTable.staffId))
+      .where(
+        sql`${userTable.firstName} || ' ' || ${userTable.lastName} ILIKE ${searchTerm}`
+      )
+      .orderBy(desc(userTable.codeNumber));
+
+    return staffUsers;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function fetchCustomers(search: string = "") {
+  try {
+    const searchTerm = `%${search.toLowerCase()}%`;
+    const us = await db
+      .select({
+        codeNumber: userTable.codeNumber,
+        name: sql`${userTable.firstName} || ' ' || ${userTable.lastName} AS name`,
+        email: userTable.email,
+        contact: userTable.contact,
+        createdAt: userTable.createdAt,
       })
       .from(userTable)
       .leftJoin(staffTable, eq(userTable.userId, staffTable.staffId))
+      .where(
+        and(
+          sql`${userTable.firstName} || ' ' || ${userTable.lastName} ILIKE ${searchTerm}`,
+          isNull(staffTable.staffId)
+        )
+      )
       .orderBy(desc(userTable.codeNumber));
 
     return us;

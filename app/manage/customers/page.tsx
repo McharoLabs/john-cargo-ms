@@ -1,14 +1,5 @@
 "use client";
-
-import React, { useState, useEffect } from "react";
-import { Search } from "lucide-react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import NewUserClientForm from "@/components/new-user-form.client";
-import UsersClientTable from "@/components/users-table.client";
-import { fetchStaffs } from "@/actions/user-actions";
-import { Customer } from "@/lib/types";
-import Spinner from "@/components/spinner";
+import React from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -17,20 +8,28 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
+import { fetchCustomers } from "@/actions/user-actions";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import UsersClientTable from "@/components/users-table.client";
+import Spinner from "@/components/spinner";
+import { Customer, User } from "@/lib/types";
+import NewUserClientForm from "@/components/new-user-form.client";
 
-const UsersPage = () => {
-  const [userData, setUserData] = useState<Customer[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+const CustomersPage = () => {
+  const [userData, setUserData] = React.useState<Customer[]>([]);
+  const [loading, setLoading] = React.useState<boolean>(true);
 
-  const getUsers = async (search: string = "") => {
+  const getCustomers = async (search: string = "") => {
     setLoading(true);
-    const data = await fetchStaffs(search);
+    const data = await fetchCustomers(search);
     setUserData(data);
     setLoading(false);
   };
 
-  useEffect(() => {
-    getUsers();
+  React.useEffect(() => {
+    getCustomers();
   }, []);
 
   return (
@@ -40,22 +39,22 @@ const UsersPage = () => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="/manage/users">Dashboard</Link>
+                <Link href="/manage/dashboard">Dashboard</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="#">Users</Link>
+                <Link href="#">Customers</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
         <NewUserClientForm
-          title={"New Staff"}
-          isStaff={true}
-          callback={getUsers}
+          title={"New Customer"}
+          isStaff={false}
+          callback={getCustomers}
         />
 
         <Card x-chunk="dashboard-05-chunk-3">
@@ -65,7 +64,7 @@ const UsersPage = () => {
               <Input
                 onInput={(event) => {
                   const inputValue = (event.target as HTMLInputElement).value;
-                  getUsers(inputValue);
+                  getCustomers(inputValue);
                 }}
                 type="search"
                 placeholder="Search..."
@@ -82,4 +81,4 @@ const UsersPage = () => {
   );
 };
 
-export default UsersPage;
+export default CustomersPage;

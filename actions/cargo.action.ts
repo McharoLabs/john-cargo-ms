@@ -3,7 +3,7 @@
 import { db } from "@/db";
 import { cargoTable, userTable } from "@/db/schema";
 import { CargoFormSchema, CargoFormSchemaType } from "@/lib/types";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, or, sql } from "drizzle-orm";
 
 export const addCargo = async (data: CargoFormSchemaType) => {
   try {
@@ -73,23 +73,83 @@ export const addCargo = async (data: CargoFormSchemaType) => {
   }
 };
 
-export const fetchCargos = async () => {
+export const fetchCargos = async (search: string = "") => {
   try {
+    const searchTerm = `%${search.toLowerCase()}%`;
+
     const result = await db
       .select({
         cargo: cargoTable,
         users: {
           codeNumber: userTable.codeNumber,
-          firstName: userTable.firstName,
-          lastName: userTable.lastName,
+          name: sql`${userTable.firstName} || ' ' || ${userTable.lastName} AS name`,
           email: userTable.email,
           contact: userTable.contact,
+          createdAt: userTable.createdAt,
         },
       })
       .from(cargoTable)
-      .innerJoin(userTable, eq(cargoTable.codeNumber, userTable.codeNumber));
+      .innerJoin(userTable, eq(cargoTable.codeNumber, userTable.codeNumber))
+      .where(
+        or(
+          sql`${cargoTable.codeNumber} ILIKE ${searchTerm}`,
+          sql`${userTable.firstName} || ' ' || ${userTable.lastName} ILIKE ${searchTerm}`,
+          sql`${userTable.email} ILIKE ${searchTerm}`,
+          sql`${userTable.contact} ILIKE ${searchTerm}`
+        )
+      )
+      .orderBy(desc(cargoTable.postingDate));
 
     return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const shipped = async (cargoId: string) => {
+  try {
+    const existingReceipt = await db
+      .select({ cargoId: cargoTable.cargoId })
+      .from(cargoTable)
+      .where(eq(cargoTable.cargoId, cargoId));
+
+    console.info(existingReceipt);
+    if (existingReceipt.length === 0) {
+      return { success: false, detail: "Cargo not found" };
+    }
+
+    await db
+      .update(cargoTable)
+      .set({ shipped: true, updatedAt: new Date() })
+      .where(eq(cargoTable.cargoId, cargoId));
+
+    return { success: true, detail: "Shipped successfully" };
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const received = async (cargoId: string) => {
+  try {
+    const existingReceipt = await db
+      .select({ cargoId: cargoTable.cargoId, shipped: cargoTable.shipped })
+      .from(cargoTable)
+      .where(eq(cargoTable.cargoId, cargoId));
+
+    if (existingReceipt.length === 0) {
+      return { success: false, detail: "Cargo not found" };
+    }
+
+    if (!existingReceipt[0].shipped) {
+      return { success: false, detail: "Not shipped" };
+    }
+
+    await db
+      .update(cargoTable)
+      .set({ received: true, updatedAt: new Date() })
+      .where(eq(cargoTable.cargoId, cargoId));
+
+    return { success: true, detail: "Shipped successfully" };
   } catch (error) {
     throw error;
   }
