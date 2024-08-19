@@ -3,7 +3,6 @@ import Credentials from "next-auth/providers/credentials";
 import type { DefaultSession, NextAuthConfig } from "next-auth";
 import { compare } from "bcrypt-ts";
 import { findUserByEmail } from "@/actions/auth.action";
-export const BASE_PATH = "/api/auth";
 
 export const authOptions: NextAuthConfig = {
   providers: [
@@ -42,6 +41,7 @@ export const authOptions: NextAuthConfig = {
       },
     }),
   ],
+  basePath: process.env.BASE_PATH,
   secret: process.env.AUTH_SECRET,
   pages: { signIn: "/auth/signin", verifyRequest: "/auth/verify-request" },
   callbacks: {

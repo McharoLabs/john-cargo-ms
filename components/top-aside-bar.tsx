@@ -1,5 +1,6 @@
 "use client";
 
+import { signIn, signOut } from "@/auth/helper";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { redirect, usePathname } from "next/navigation";
@@ -297,6 +298,36 @@ const TopAsideBar = () => {
                   <span className="ms-3">All Cargo</span>
                 </Link>
               </ul>
+            </li>
+
+            <li>
+              <Link
+                href=""
+                onClick={async () => {
+                  await signOut();
+                  window.location.reload();
+                }}
+                className={`flex items-center p-2 text-gray-900 rounded-lg   hover:bg-gray-100 group`}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  className="lucide lucide-log-out text-blue-500 transition duration-75 group-hover:text-blue-700"
+                >
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" x2="9" y1="12" y2="12" />
+                </svg>
+
+                <span className="ms-3">Sign Out</span>
+              </Link>
             </li>
           </ul>
         </div>

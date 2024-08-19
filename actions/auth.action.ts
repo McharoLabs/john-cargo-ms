@@ -53,4 +53,3 @@ export async function findUserByEmail({ email }: { email: string }) {
 
   return user;
 }
-
