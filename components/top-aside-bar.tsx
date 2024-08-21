@@ -287,7 +287,7 @@ const TopAsideBar = () => {
                 >
                   <path
                     stroke="currentColor"
-                    stroke-width="2"
+                    strokeWidth="2"
                     d="M3 13h1v6H3v-6zm16 0h1v6h-1v-6zM4 9h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2zM6 15h1v1H6v-1zM10 15h1v1h-1v-1zM14 15h1v1h-1v-1zM18 15h1v1h-1v-1zM4 7v2h16V7H4zM4 11v2h16v-2H4z"
                   />
                 </svg>
@@ -303,7 +303,7 @@ const TopAsideBar = () => {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
+                  strokeWidth="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   className="lucide lucide-chevron-down"
@@ -349,7 +349,7 @@ const TopAsideBar = () => {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  stroke-width="2"
+                  strokeWidth="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   className="lucide lucide-log-out text-blue-500 transition duration-75 group-hover:text-blue-700"
