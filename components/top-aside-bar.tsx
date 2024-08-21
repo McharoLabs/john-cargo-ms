@@ -2,6 +2,7 @@
 
 import { signIn, signOut } from "@/auth/helper";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect, usePathname } from "next/navigation";
 import React from "react";
@@ -62,7 +63,11 @@ const TopAsideBar = () => {
                 </svg>
               </button>
               <a href="" className="flex ms-2 md:me-24">
-                <img src="/favicon.ico" className="h-11 me-3" alt="IMS Logo" />
+                <Image
+                  src="/favicon.ico"
+                  className="h-11 me-3"
+                  alt="IMS Logo"
+                />
               </a>
             </div>
 

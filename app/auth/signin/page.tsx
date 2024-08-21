@@ -1,7 +1,4 @@
 import LoginForm from "@/components/login-form.client";
-import { db } from "@/db";
-import { userTable } from "@/db/schema";
-import { generateTimestampCode } from "@/lib/utils";
 import React from "react";
 
 const LoginPage = async () => {
