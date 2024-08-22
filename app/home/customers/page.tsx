@@ -15,7 +15,6 @@ import { Input } from "@/components/ui/input";
 import UsersClientTable from "@/components/users-table.client";
 import Spinner from "@/components/spinner";
 import { Customer, User } from "@/lib/types";
-import NewUserClientForm from "@/components/new-user-form.client";
 
 const CustomersPage = () => {
   const [userData, setUserData] = React.useState<Customer[]>([]);
