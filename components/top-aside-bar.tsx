@@ -65,8 +65,11 @@ const TopAsideBar = () => {
               <a href="" className="flex ms-2 md:me-24">
                 <Image
                   src="/favicon.ico"
-                  className="h-11 me-3"
+                  className="h-11  me-3"
+                  height={44}
+                  width={60}
                   alt="IMS Logo"
+                  priority
                 />
               </a>
             </div>
@@ -81,8 +84,10 @@ const TopAsideBar = () => {
                 >
                   <span className="sr-only">Open user menu</span>
                   <Image
-                    className="w-8 h-8 rounded-full"
+                    className=" rounded-full"
                     src="/favicon.ico"
+                    height={32}
+                    width={32}
                     alt="user photo"
                   />
                 </button>
@@ -309,8 +314,8 @@ const TopAsideBar = () => {
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   className="lucide lucide-chevron-down"
                 >
                   <path d="m6 9 6 6 6-6" />
@@ -355,8 +360,8 @@ const TopAsideBar = () => {
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   className="lucide lucide-log-out text-blue-500 transition duration-75 group-hover:text-blue-700"
                 >
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />

@@ -1,5 +1,5 @@
 "use server";
-import { staffTable, userTable } from "@/db/schema";
+import { cargoTable, staffTable, userTable } from "@/db/schema";
 import { db } from "@/db";
 import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import { RegistrationSchema, RegistrationSchemaType } from "@/lib/types";
@@ -165,3 +165,69 @@ export const searchCustomer = async (search: string = "") => {
     throw error;
   }
 };
+
+export async function countStaffs() {
+  try {
+    const count = await db
+      .select({
+        staffCount: sql<number>`COUNT(${staffTable.staffId}) AS staffCount`,
+      })
+      .from(staffTable)
+      .innerJoin(userTable, eq(userTable.userId, staffTable.staffId));
+
+    return count[0]?.staffCount ?? 0;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function countCustomers() {
+  try {
+    const count = await db
+      .select({
+        customerCount: sql<number>`COUNT(${userTable.userId}) AS customerCount`,
+      })
+      .from(userTable)
+      .leftJoin(staffTable, eq(userTable.userId, staffTable.staffId))
+      .where(isNull(staffTable.staffId));
+
+    return count[0]?.customerCount ?? 0;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function countPaymentStatuses() {
+  try {
+    const [notPaid, partiallyPaid, paidInFull] = await Promise.all([
+      db
+        .select({
+          count: sql<number>`COUNT(${cargoTable.cargoId})`,
+        })
+        .from(cargoTable)
+        .where(eq(cargoTable.status, "Not Paid")),
+
+      db
+        .select({
+          count: sql<number>`COUNT(${cargoTable.cargoId})`,
+        })
+        .from(cargoTable)
+        .where(eq(cargoTable.status, "Partially Paid")),
+
+      db
+        .select({
+          count: sql<number>`COUNT(${cargoTable.cargoId})`,
+        })
+        .from(cargoTable)
+        .where(eq(cargoTable.status, "Paid in Full")),
+    ]);
+
+    return {
+      notPaid: notPaid[0]?.count ?? 0,
+      partiallyPaid: partiallyPaid[0]?.count ?? 0,
+      paidInFull: paidInFull[0]?.count ?? 0,
+    };
+  } catch (error) {
+    throw error;
+  }
+}
