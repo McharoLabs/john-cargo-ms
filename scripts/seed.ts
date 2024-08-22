@@ -4,7 +4,7 @@ async function main() {
   const userData = {
     firstName: "John",
     lastName: "Cargo",
-    email: "jogn@gmail.com",
+    email: "john@gmail.com",
     contact: "0717251140",
     isStaff: true,
   };
