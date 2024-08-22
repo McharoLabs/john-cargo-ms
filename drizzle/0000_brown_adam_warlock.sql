@@ -15,9 +15,9 @@ CREATE TABLE IF NOT EXISTS "cargo" (
 	"exchange_rate" numeric(10, 2) NOT NULL,
 	"total_shipment_tshs" numeric(10, 2) NOT NULL,
 	"amount_paid" numeric(10, 2) NOT NULL,
-	"credit_amount" numeric(10, 2) NOT NULL,
-	"outstanding" numeric(10, 2) NOT NULL,
-	"balance" numeric(10, 2) NOT NULL,
+	"credit_amount" numeric(10, 2),
+	"outstanding" numeric(10, 2),
+	"balance" numeric(10, 2),
 	"status" "cargo_status" DEFAULT 'Not Paid' NOT NULL,
 	"shipped" boolean DEFAULT false NOT NULL,
 	"received" boolean DEFAULT false NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS "cargo" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "stafs" (
+CREATE TABLE IF NOT EXISTS "staffs" (
 	"staff_id" uuid PRIMARY KEY NOT NULL,
 	"is_super_user" boolean DEFAULT false NOT NULL,
 	"department" varchar(255),
@@ -54,7 +54,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "stafs" ADD CONSTRAINT "stafs_staff_id_users_user_id_fk" FOREIGN KEY ("staff_id") REFERENCES "public"."users"("user_id") ON DELETE no action ON UPDATE no action;
+ ALTER TABLE "staffs" ADD CONSTRAINT "staffs_staff_id_users_user_id_fk" FOREIGN KEY ("staff_id") REFERENCES "public"."users"("user_id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

@@ -1,10 +1,9 @@
-import { drizzle } from "drizzle-orm/postgres-js";
+import { drizzle } from "drizzle-orm/vercel-postgres/driver";
 import * as schema from "./schema";
-import postgres from "postgres";
-import dotenv from "dotenv";
+import { sql } from "@vercel/postgres";
+import { loadEnvConfig } from "@next/env";
 
-dotenv.config();
+const projectDir = process.cwd();
+loadEnvConfig(projectDir, true);
 
-const client = postgres(process.env.DATABASE_URL as string);
-
-export const db = drizzle(client, { schema: schema, logger: true });
+export const db = drizzle(sql, { schema });

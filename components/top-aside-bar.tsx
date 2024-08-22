@@ -80,7 +80,7 @@ const TopAsideBar = () => {
                   onClick={toggleDropdownUserBar}
                 >
                   <span className="sr-only">Open user menu</span>
-                  <img
+                  <Image
                     className="w-8 h-8 rounded-full"
                     src="/favicon.ico"
                     alt="user photo"
