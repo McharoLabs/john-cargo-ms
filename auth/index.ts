@@ -3,6 +3,10 @@ import Credentials from "next-auth/providers/credentials";
 import type { DefaultSession, NextAuthConfig } from "next-auth";
 import { compare } from "bcrypt-ts";
 import { findUserByEmail } from "@/actions/auth.action";
+import { loadEnvConfig } from "@next/env";
+
+const projectDir = process.cwd();
+loadEnvConfig(projectDir, true);
 
 export const authOptions: NextAuthConfig = {
   providers: [
