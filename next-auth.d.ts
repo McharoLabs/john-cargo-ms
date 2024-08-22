@@ -18,3 +18,9 @@ declare module "next-auth" {
     lastName?: string;
   }
 }
+
+export interface DBCredentials {
+  url: string;
+  authToken?: string;
+  connectionString?: string;
+}

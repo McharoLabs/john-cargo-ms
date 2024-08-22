@@ -1,15 +1,14 @@
 import { migrate } from "drizzle-orm/vercel-postgres/migrator";
-import { db } from ".";
 
 import { loadEnvConfig } from "@next/env";
+import { db } from "@/db";
 
 const projectDir = process.cwd();
 loadEnvConfig(projectDir, true);
 
 async function main() {
-  console.log("POSTGRES_URL:", process.env.POSTGRES_URL);
   try {
-    await migrate(db, { migrationsFolder: "./migrations" });
+    await migrate(db, { migrationsFolder: "./drizzle" });
     console.log("Migration completed successfully.");
   } catch (error) {
     console.error("Migration failed:", error);

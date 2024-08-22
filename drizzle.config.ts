@@ -1,11 +1,15 @@
 import { defineConfig } from "drizzle-kit";
+import { loadEnvConfig } from "@next/env";
+
+const projectDir = process.cwd();
+loadEnvConfig(projectDir, true);
 
 export default defineConfig({
   schema: "./db/schema.ts",
-  out: "./db/migrations",
+  out: "drizzle",
   dialect: "postgresql",
   dbCredentials: {
-    url: "postgres://postgres:postgres@localhost:5432/john_cargo_ms_db",
+    url: process.env.POSTGRES_URL!,
   },
   verbose: true,
   strict: true,

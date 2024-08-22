@@ -1,1 +1,0 @@
-ALTER TABLE "cargo" ALTER COLUMN "credit_amount" DROP NOT NULL;

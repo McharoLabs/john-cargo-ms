@@ -1,6 +1,6 @@
 {
-  "id": "4a2f9ab3-992f-4d70-9e06-4a0b4d9ec043",
-  "prevId": "a72a6499-5456-46c5-ba82-b5e269c7facd",
+  "id": "adfc8e7d-6625-43ec-8061-cfc3e980d185",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -79,13 +79,13 @@
           "name": "outstanding",
           "type": "numeric(10, 2)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "balance": {
           "name": "balance",
           "type": "numeric(10, 2)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "status": {
           "name": "status",
