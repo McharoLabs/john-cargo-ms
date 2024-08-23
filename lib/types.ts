@@ -55,11 +55,17 @@ export const CargoFormSchema = z.object({
   creditAmount: z.string().optional().optional(),
   outstanding: z.string().optional(),
   balance: z.string().optional(),
-  status: z.enum([STATUS.NOT_PAID, STATUS.PARTIALLY_PAID, STATUS.PAID], {
+  status: z.enum([STATUS.PARTIALLY_PAID, STATUS.PAID], {
     message: "Select cargo status",
   }),
   shipped: z.boolean().default(false),
   received: z.boolean().default(false),
+  paymentCurrency: z.string().min(1, {
+    message: "Please select a currency.",
+  }),
+  costPerKgCurrency: z.string().min(1, {
+    message: "Please select a currency.",
+  }),
 });
 
 export type CargoFormSchemaType = z.infer<typeof CargoFormSchema>;
@@ -89,7 +95,7 @@ interface Cargo {
   cargoId: string;
   codeNumber: string;
   postingDate: Date;
-  totalBox: string;
+  totalBox: number;
   totalWeight: string;
   costPerKg: string;
   totalShipmentUSD: string;
@@ -114,7 +120,24 @@ export interface Customer {
   createdAt: Date;
 }
 
-export interface CargoWithCustomer {
+export interface CargoReceipts {
   cargo: Cargo;
   users: Customer;
 }
+
+export interface CargoReceiptValidationSuccess {
+  costPerKgInUsd: number;
+  totalShipmentInTshs: number;
+  totalShipmentInUsd: number;
+  amountPaidInTshs: number;
+  amountPaidInUsd: number;
+  costPerKgInTshs: number;
+}
+
+export interface CargoReceiptValidationError {
+  detail: string;
+}
+
+export type CargoReceiptValidationResult =
+  | CargoReceiptValidationSuccess
+  | CargoReceiptValidationError;

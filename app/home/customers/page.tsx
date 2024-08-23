@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import UsersClientTable from "@/components/users-table.client";
 import Spinner from "@/components/spinner";
 import { Customer, User } from "@/lib/types";
+import NewUserClientForm from "@/components/new-user-form.client";
 
 const CustomersPage = () => {
   const [userData, setUserData] = React.useState<Customer[]>([]);
@@ -38,7 +39,7 @@ const CustomersPage = () => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="/manage/dashboard">Dashboard</Link>
+                <Link href="/home/dashboard">Dashboard</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
@@ -49,6 +50,12 @@ const CustomersPage = () => {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
+
+        <NewUserClientForm
+          title={"New Customer"}
+          isStaff={false}
+          callback={getCustomers}
+        />
 
         <Card x-chunk="dashboard-05-chunk-3">
           <CardHeader className="px-7">

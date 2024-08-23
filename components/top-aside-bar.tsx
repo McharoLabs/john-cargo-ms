@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn, signOut } from "@/auth/helper";
+import { signOut } from "@/auth/helper";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -62,7 +62,7 @@ const TopAsideBar = () => {
                   ></path>
                 </svg>
               </button>
-              <a href="" className="flex ms-2 md:me-24">
+              <Link href="" className="flex ms-2 md:me-24">
                 <Image
                   src="/favicon.ico"
                   className="h-11  me-3"
@@ -71,7 +71,7 @@ const TopAsideBar = () => {
                   alt="IMS Logo"
                   priority
                 />
-              </a>
+              </Link>
             </div>
 
             <div className="relative flex items-center ms-3">
@@ -116,36 +116,25 @@ const TopAsideBar = () => {
                 </div>
                 <ul className="py-1">
                   <li>
-                    <a
-                      href="#"
+                    <Link
+                      href="/home/dashboard"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
                     >
                       Dashboard
-                    </a>
+                    </Link>
                   </li>
+
                   <li>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >
-                      Settings
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >
-                      Earnings
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
+                    <Link
+                      href=""
+                      onClick={async () => {
+                        await signOut();
+                        window.location.reload();
+                      }}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
                     >
                       Sign out
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -165,17 +154,9 @@ const TopAsideBar = () => {
           <ul className="space-y-2 font-medium">
             <li>
               <Link
-                href={`${
-                  session?.user.isSuperUser
-                    ? "/manage/dashboard"
-                    : "/home/dashboard"
-                }`}
+                href="/home/dashboard"
                 className={`flex items-center p-2 text-gray-900 rounded-lg  ${
-                  pathname === "/manage/dashboard"
-                    ? "bg-gray-100"
-                    : pathname === "/home/dashboard"
-                    ? "bg-graye-100"
-                    : ""
+                  pathname === "/home/dashboard" ? "bg-graye-100" : ""
                 } hover:bg-gray-100 group`}
               >
                 <svg
@@ -194,65 +175,9 @@ const TopAsideBar = () => {
 
             <li>
               <Link
-                href="/manage/users"
-                className={`${
-                  session?.user.isSuperUser ? "flex" : "hidden"
-                } items-center p-2 text-gray-900 rounded-lg  ${
-                  pathname === "/manage/users" ? "bg-gray-100" : ""
-                } hover:bg-gray-100 group`}
-              >
-                <svg
-                  className="w-5 h-5 text-blue-500 transition duration-75 group-hover:text-blue-700"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
-                  />
-                </svg>
-
-                <span className="ms-3">Users</span>
-              </Link>
-            </li>
-
-            <li>
-              <Link
-                href="/manage/customers"
-                className={`${
-                  session?.user.isSuperUser ? "flex" : "hidden"
-                } items-center p-2 text-gray-900 rounded-lg  ${
-                  pathname === "/manage/customers" ? "bg-gray-100" : ""
-                } hover:bg-gray-100 group`}
-              >
-                <svg
-                  className="w-5 h-5 text-blue-500 transition duration-75 group-hover:text-blue-700"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
-                  />
-                </svg>
-
-                <span className="ms-3">Customers</span>
-              </Link>
-            </li>
-
-            <li>
-              <Link
                 href="/home/customers"
                 className={`${
-                  !session?.user.isSuperUser ? "flex" : "hidden"
+                  session?.user.isSuperUser ? "flex" : "hidden"
                 } items-center p-2 text-gray-900 rounded-lg  ${
                   pathname === "/home/customers" ? "bg-gray-100" : ""
                 } hover:bg-gray-100 group`}
@@ -277,6 +202,61 @@ const TopAsideBar = () => {
             </li>
 
             <li>
+              <Link
+                href="/home/cargo-receipts"
+                className={` flex items-center p-2 text-gray-900 rounded-lg  ${
+                  pathname === "/home/cargo-receipts" ? "bg-gray-100" : ""
+                } hover:bg-gray-100 group`}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-6 h-6 text-blue-500 transition duration-75 group-hover:text-blue-700"
+                >
+                  <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
+
+                <span className="ms-3">Receipts</span>
+              </Link>
+            </li>
+
+            <li>
+              <Link
+                href="/home/users"
+                className={`${
+                  session?.user.isSuperUser ? "flex" : "hidden"
+                } items-center p-2 text-gray-900 rounded-lg  ${
+                  pathname === "/home/users" ? "bg-gray-100" : ""
+                } hover:bg-gray-100 group`}
+              >
+                <svg
+                  className="w-5 h-5 text-blue-500 transition duration-75 group-hover:text-blue-700"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke="currentColor"
+                    d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
+                  />
+                </svg>
+
+                <span className="ms-3">Users</span>
+              </Link>
+            </li>
+
+            {/* <li>
               <Link
                 onClick={toggleNavDropdown}
                 className={` ${
@@ -341,7 +321,7 @@ const TopAsideBar = () => {
                   <span className="ms-3">All Receipt</span>
                 </Link>
               </ul>
-            </li>
+            </li> */}
 
             <li>
               <Link

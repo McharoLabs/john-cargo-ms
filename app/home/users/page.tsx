@@ -40,7 +40,7 @@ const UsersPage = () => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="/manage/users">Dashboard</Link>
+                <Link href="/home/users">Dashboard</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />

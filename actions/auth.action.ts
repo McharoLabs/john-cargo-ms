@@ -17,7 +17,7 @@ export async function loginAction(formData: LoginFormSchemaType) {
     await signIn("credentials", {
       email: formData.email,
       password: formData.password,
-      redirectTo: "/auth/verify-request",
+      redirectTo: "/home/dashboard",
       redirect: true,
     });
 

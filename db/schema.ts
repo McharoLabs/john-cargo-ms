@@ -6,6 +6,7 @@ import {
   decimal,
   uuid,
   pgEnum,
+  integer,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm/sql";
 
@@ -44,13 +45,15 @@ export const cargoStatusEnum = pgEnum("cargo_status", [
   "Paid in Full",
 ]);
 
+export const currencyEnum = pgEnum("currency", ["TSHS", "USD"]);
+
 export const cargoTable = pgTable("cargo", {
   cargoId: uuid("cargo_id").primaryKey().defaultRandom(),
   codeNumber: varchar("code_number", { length: 50 })
     .references(() => userTable.codeNumber)
     .notNull(),
   postingDate: timestamp("posting_date").notNull(),
-  totalBox: decimal("total_box", { precision: 10, scale: 0 }).notNull(),
+  totalBox: integer("total_box").notNull(),
   totalWeight: decimal("total_weight", { precision: 10, scale: 2 }).notNull(),
   costPerKg: decimal("cost_per_kg", { precision: 10, scale: 2 }).notNull(),
   totalShipmentUSD: decimal("total_shipment_usd", {
@@ -63,10 +66,11 @@ export const cargoTable = pgTable("cargo", {
     scale: 2,
   }).notNull(),
   amountPaid: decimal("amount_paid", { precision: 10, scale: 2 }).notNull(),
+  paymentCurrency: currencyEnum("payment_currency").notNull().default("TSHS"),
   creditAmount: decimal("credit_amount", { precision: 10, scale: 2 }),
   outstanding: decimal("outstanding", { precision: 10, scale: 2 }),
   balance: decimal("balance", { precision: 10, scale: 2 }),
-  status: cargoStatusEnum("status").notNull().default("Not Paid"),
+  status: cargoStatusEnum("status").notNull().default("Partially Paid"),
   shipped: boolean("shipped").default(false).notNull(),
   received: boolean("received").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),

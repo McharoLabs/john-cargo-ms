@@ -29,6 +29,9 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ChevronsUpDown } from "lucide-react";
+import { AlertCircle } from "lucide-react";
+
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 type NewUserClientFormProps = {
   title: string;
@@ -43,6 +46,7 @@ const NewUserClientForm: React.FC<NewUserClientFormProps> = ({
 }) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
+  const [detail, setDetail] = React.useState<string | null>(null);
   const { toast } = useToast();
   const form = useForm<RegistrationSchemaType>({
     resolver: zodResolver(RegistrationSchema),
@@ -54,6 +58,7 @@ const NewUserClientForm: React.FC<NewUserClientFormProps> = ({
   });
 
   const onSubmit: SubmitHandler<RegistrationSchemaType> = async (data) => {
+    setDetail(null);
     setIsLoading(true);
     try {
       const res = await createUser(data);
@@ -68,15 +73,9 @@ const NewUserClientForm: React.FC<NewUserClientFormProps> = ({
             });
           });
         } else if (res.detail) {
-          toast({
-            title: "Detail",
-            description: res.detail,
-          });
+          setDetail(res.detail);
         } else {
-          toast({
-            title: "Detail",
-            description: "An unexpected error occurred.",
-          });
+          setDetail("An unexpected error occurred.");
         }
 
         return;
@@ -85,6 +84,7 @@ const NewUserClientForm: React.FC<NewUserClientFormProps> = ({
       toast({
         title: "Detail",
         description: res.detail,
+        className: "bg-green-500 text-white",
       });
       form.reset({
         firstName: "",
@@ -119,7 +119,15 @@ const NewUserClientForm: React.FC<NewUserClientFormProps> = ({
             </CollapsibleTrigger>
           </div>
           <CollapsibleContent>
-            <CardContent>
+            <CardContent className="space-y-6">
+              {detail && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Detail</AlertTitle>
+                  <AlertDescription>{detail}</AlertDescription>
+                </Alert>
+              )}
+
               <form onSubmit={form.handleSubmit(onSubmit)} className="w-full ">
                 <div className="grid gap-4">
                   <div className="grid grid-cols-2 gap-4">

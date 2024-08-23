@@ -20,11 +20,7 @@ export default auth((req) => {
     );
   }
 
-  if (req.auth?.user.isSuperUser && reqUrl.pathname.startsWith("/home")) {
-    return NextResponse.redirect(new URL("/auth/401", req.url));
-  }
-
-  if (!req.auth?.user.isSuperUser && reqUrl.pathname.startsWith("/manage")) {
+  if (!req.auth?.user.isSuperUser && reqUrl.pathname === "/home/users") {
     return NextResponse.redirect(new URL("/auth/401", req.url));
   }
 

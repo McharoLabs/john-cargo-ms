@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Spinner from "@/components/spinner";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,54 +9,50 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
-import { fetchCustomers } from "@/actions/user-actions";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Search } from "lucide-react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import UsersClientTable from "@/components/users-table.client";
-import Spinner from "@/components/spinner";
-import { Customer, User } from "@/lib/types";
-import NewUserClientForm from "@/components/new-user-form.client";
+import CargoClientForm from "@/components/new-cargo-form.client";
+import CargoReceiptsTable from "@/components/cargo-receipt-table";
+import { fetchCargoReceipts } from "@/actions/cargo.action";
+import { CargoReceipts } from "@/lib/types";
 
-const CustomersPage = () => {
-  const [userData, setUserData] = React.useState<Customer[]>([]);
-  const [loading, setLoading] = React.useState<boolean>(true);
-
-  const getCustomers = async (search: string = "") => {
-    setLoading(true);
-    const data = await fetchCustomers(search);
-    setUserData(data);
-    setLoading(false);
-  };
+const CargoReceiptsPage = () => {
+  const [loading, setisLoading] = React.useState<boolean>(false);
+  const [cargoReceipts, setCargoReceipts] = React.useState<CargoReceipts[]>([]);
 
   React.useEffect(() => {
-    getCustomers();
+    getCargoreceipts();
   }, []);
 
+  const getCargoreceipts = async (search: string = "") => {
+    try {
+      const data = await fetchCargoReceipts(search);
+      setCargoReceipts(data ?? []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <div className=" flex place-content-center ">
-      <div className="max-w-7xl w-full space-y-10">
+      <div className=" w-full space-y-10">
         <Breadcrumb className="hidden md:flex ">
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="/manage/dashboard">Dashboard</Link>
+                <Link href="/home/dashboard">Dashboard</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="#">Customers</Link>
+                <Link href="#">Receipts</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
 
-        <NewUserClientForm
-          title={"New Customer"}
-          isStaff={false}
-          callback={getCustomers}
-        />
+        <CargoClientForm callback={getCargoreceipts} />
 
         <Card x-chunk="dashboard-05-chunk-3">
           <CardHeader className="px-7">
@@ -64,7 +61,7 @@ const CustomersPage = () => {
               <Input
                 onInput={(event) => {
                   const inputValue = (event.target as HTMLInputElement).value;
-                  getCustomers(inputValue);
+                  getCargoreceipts(inputValue);
                 }}
                 type="search"
                 placeholder="Search..."
@@ -73,7 +70,14 @@ const CustomersPage = () => {
             </div>
           </CardHeader>
           <CardContent>
-            {loading ? <Spinner /> : <UsersClientTable data={userData} />}
+            {loading ? (
+              <Spinner />
+            ) : (
+              <CargoReceiptsTable
+                cargoReceipts={cargoReceipts}
+                callback={getCargoreceipts}
+              />
+            )}
           </CardContent>
         </Card>
       </div>
@@ -81,4 +85,11 @@ const CustomersPage = () => {
   );
 };
 
-export default CustomersPage;
+export default CargoReceiptsPage;
+
+{
+  /* <div className=" flex place-content-center ">
+      <div className="max-w-7xl w-full ">
+      </div>
+    </div> */
+}

@@ -2,7 +2,12 @@
 
 import { db } from "@/db";
 import { cargoTable, userTable } from "@/db/schema";
-import { CargoFormSchema, CargoFormSchemaType } from "@/lib/types";
+import { CURRENCY, STATUS } from "@/lib/enum";
+import {
+  CargoFormSchema,
+  CargoFormSchemaType,
+  CargoReceiptValidationResult,
+} from "@/lib/types";
 import { desc, eq, or, sql } from "drizzle-orm";
 
 export const addCargo = async (data: CargoFormSchemaType) => {
@@ -18,6 +23,7 @@ export const addCargo = async (data: CargoFormSchemaType) => {
         creditAmount: cargoTable.creditAmount,
         outstanding: cargoTable.outstanding,
         balance: cargoTable.balance,
+        paymentCurrency: cargoTable.paymentCurrency,
       })
       .from(cargoTable)
       .where(eq(cargoTable.codeNumber, data.codeNumber))
@@ -32,48 +38,73 @@ export const addCargo = async (data: CargoFormSchemaType) => {
     }
 
     const {
-      newOutstanding,
-      totalShipmentTshs,
-      totalShipmentUSD,
+      detail,
+      newBalance,
       newCreditAmount,
+      newOutStanding,
+      totalShipmentInTshs,
+      totalShipmentInUsd,
+      costPerKgInTshs,
     } = cargoCal(
-      data.totalBox,
+      previousOutstanding,
+      PrevBalance,
       data.totalWeight,
-      data.costPerKg,
       data.exchangeRate,
       data.amountPaid,
-      previousOutstanding,
-      PrevBalance
+      data.costPerKgCurrency as CURRENCY,
+      data.costPerKg,
+      data.paymentCurrency as CURRENCY
     );
 
+    if (detail) {
+      return { success: false, detail: detail };
+    }
+
     const cargoData = {
-      amountPaid: data.amountPaid,
-      balance:
-        newOutstanding !== null ? String(newOutstanding.toFixed(2)) : null,
-      totalWeight: data.totalWeight,
-      status: data.status,
       codeNumber: data.codeNumber,
-      costPerKg: data.costPerKg,
-      exchangeRate: data.exchangeRate,
-      outstanding:
-        newOutstanding !== null ? String(newOutstanding.toFixed(2)) : null,
-      postingDate: new Date(data.postingDate),
-      totalBox: data.totalBox,
-      totalShipmentTshs: String(totalShipmentTshs.toFixed(2)),
-      totalShipmentUSD: String(totalShipmentUSD.toFixed(2)),
+      postingDate: data.postingDate ? new Date(data.postingDate) : new Date(),
+      totalBox: Number(data.totalBox),
+      totalWeight: String(data.totalWeight),
+      costPerKg:
+        costPerKgInTshs !== undefined
+          ? String(costPerKgInTshs.toFixed(2))
+          : "0.0",
+      totalShipmentUSD:
+        totalShipmentInUsd !== undefined
+          ? String(totalShipmentInUsd.toFixed(2))
+          : "0.0",
+      exchangeRate: String(data.exchangeRate),
+      totalShipmentTshs:
+        totalShipmentInTshs !== undefined
+          ? String(totalShipmentInTshs.toFixed(2))
+          : "0.0",
+      amountPaid: String(data.amountPaid),
+      paymentCurrency: data.paymentCurrency as CURRENCY,
       creditAmount:
-        newCreditAmount !== null ? String(newCreditAmount.toFixed(2)) : null,
-      shipped: data.shipped,
-      received: data.received,
+        newCreditAmount !== undefined && newCreditAmount !== null
+          ? String(newCreditAmount.toFixed(2))
+          : "0.0",
+      outstanding:
+        newOutStanding !== undefined && newOutStanding !== null
+          ? String(newOutStanding.toFixed(2))
+          : "0.0",
+      balance:
+        newBalance !== undefined && newBalance !== null
+          ? String(newBalance.toFixed(2))
+          : "0.0",
+      status: data.status as STATUS,
+      shipped: data.shipped !== undefined ? data.shipped : false,
+      received: data.received !== undefined ? data.received : false,
     };
     await db.insert(cargoTable).values(cargoData);
     return { success: true, detail: "Cargo successfully added" };
   } catch (error) {
+    console.error(error);
     throw error;
   }
 };
 
-export const fetchCargos = async (search: string = "") => {
+export const fetchCargoReceipts = async (search: string = "") => {
   try {
     const searchTerm = `%${search.toLowerCase()}%`;
 
@@ -156,31 +187,177 @@ export const received = async (cargoId: string) => {
 };
 
 const cargoCal = (
-  totalBox: string,
+  prevOutstanding: string | null,
+  prevBalance: string | null,
+
   totalWeight: string,
-  costPerKg: string,
   exchangeRate: string,
   amountPaid: string,
-  previousOutstanding: string | null,
-  prevBalance: string | null
+  costPerKgCurrency: CURRENCY,
+  costPerKg: string,
+  currentPaymentCurrency: CURRENCY
 ) => {
-  const totalShipmentUSD =
-    Number(totalWeight) * Number(totalBox) * Number(costPerKg);
-  const totalShipmentTshs =
-    totalShipmentUSD * (Number(exchangeRate) === 0 ? 1 : Number(exchangeRate));
+  const totalWeightNumber = Number(totalWeight);
+  const amountPaidNumber = Number(amountPaid);
+  const exchangeRateNumber = Number(exchangeRate);
+  const costPerKgNumber = Number(costPerKg);
+  const newCreditAmount = prevBalance !== null ? Number(prevBalance) : null;
 
-  const newCreditAmount =
-    previousOutstanding !== null
-      ? Number(previousOutstanding)
-      : previousOutstanding;
-  const newOutstanding =
-    (prevBalance !== null ? Number(prevBalance) : 0) +
-    (totalShipmentUSD - Number(amountPaid));
+  if (
+    isNaN(totalWeightNumber) ||
+    isNaN(amountPaidNumber) ||
+    isNaN(exchangeRateNumber) ||
+    isNaN(costPerKgNumber)
+  ) {
+    return { detail: "Invalid number input" };
+  }
+
+  const { amountPaidInTshs, amountPaidInUsd } = changeAmountPaid(
+    amountPaidNumber,
+    exchangeRateNumber,
+    currentPaymentCurrency
+  );
+
+  const { costPerKgInTshs, costPerKgInUsd } = changeCostPerKg(
+    costPerKgNumber,
+    costPerKgCurrency,
+    exchangeRateNumber
+  );
+
+  const { totalShipmentInTshs, totalShipmentInUsd } = changeTotalShipment(
+    totalWeightNumber,
+    costPerKgInTshs,
+    costPerKgInUsd
+  );
+
+  const newOutStanding = totalShipmentInUsd - amountPaidInUsd;
+  const newBalance =
+    newOutStanding + (prevBalance !== null ? Number(prevBalance) : 0);
 
   return {
-    totalShipmentUSD,
-    totalShipmentTshs,
-    newOutstanding,
+    newOutStanding,
+    totalShipmentInTshs,
+    totalShipmentInUsd,
     newCreditAmount,
+    newBalance,
+    costPerKgInTshs,
   };
+};
+
+export const validation = (
+  totalWeight: string,
+  exchangeRate: string,
+  amountPaid: string,
+  costPerKgCurrency: CURRENCY,
+  costPerKg: string,
+  currentPaymentCurrency: CURRENCY
+): CargoReceiptValidationResult => {
+  const totalWeightNumber = Number(totalWeight);
+  const amountPaidNumber = Number(amountPaid);
+  const exchangeRateNumber = Number(exchangeRate);
+  const costPerKgNumber = Number(costPerKg);
+
+  if (
+    isNaN(totalWeightNumber) ||
+    isNaN(amountPaidNumber) ||
+    isNaN(exchangeRateNumber) ||
+    isNaN(costPerKgNumber)
+  ) {
+    return { detail: "Invalid number input" };
+  }
+
+  if (exchangeRateNumber < 1) {
+    return { detail: "Exchange rate must be greater than 1" };
+  }
+  if (currentPaymentCurrency === costPerKgCurrency && exchangeRateNumber > 1) {
+    return { detail: "Exchange rate must be exactly 1 when currencies match " };
+  }
+
+  const { amountPaidInTshs, amountPaidInUsd } = changeAmountPaid(
+    amountPaidNumber,
+    exchangeRateNumber,
+    currentPaymentCurrency
+  );
+
+  const { costPerKgInTshs, costPerKgInUsd } = changeCostPerKg(
+    costPerKgNumber,
+    costPerKgCurrency,
+    exchangeRateNumber
+  );
+  const { totalShipmentInTshs, totalShipmentInUsd } = changeTotalShipment(
+    totalWeightNumber,
+    costPerKgInTshs,
+    costPerKgInUsd
+  );
+  // console.log("amount paid", amountPaid);
+  // console.log("total weight", totalWeight);
+  // console.log("cost per kg in tshs", costPerKgInTshs);
+  // console.log("cost per kg in usd", costPerKgInUsd);
+  // console.log("total in tshs", totalShipmentInTshs);
+  // console.log("total in usd", totalShipmentInUsd);
+  // console.log("exchange rate", exchangeRate);
+  // console.log("cost currency", costPerKgCurrency);
+  // console.log("current amount currency", currentPaymentCurrency);
+  // console.log("amount paid in tshs", amountPaidInTshs);
+  // console.log("amount paid in usd", amountPaidInUsd);
+  if (
+    (currentPaymentCurrency === CURRENCY.USD &&
+      totalShipmentInUsd >= amountPaidInUsd) ||
+    (currentPaymentCurrency === CURRENCY.TSHS &&
+      totalShipmentInTshs >= amountPaidInTshs)
+  ) {
+    return {
+      costPerKgInUsd,
+      totalShipmentInTshs,
+      totalShipmentInUsd,
+      amountPaidInTshs,
+      amountPaidInUsd,
+      costPerKgInTshs,
+    };
+  }
+
+  return { detail: "Amount paid cannot exceed the total shipment" };
+};
+
+const changeCostPerKg = (
+  costPerKgNumber: number,
+  costPerKgCurrency: CURRENCY,
+  exchangeRateNumber: number
+) => {
+  let costPerKgInUsd = 0;
+  let costPerKgInTshs = 0;
+
+  if (costPerKgCurrency === CURRENCY.USD) {
+    costPerKgInTshs = exchangeRateNumber * costPerKgNumber;
+    costPerKgInUsd = costPerKgNumber;
+  } else {
+    costPerKgInUsd = costPerKgNumber / exchangeRateNumber;
+    costPerKgInTshs = costPerKgNumber;
+  }
+
+  return { costPerKgInUsd, costPerKgInTshs };
+};
+
+const changeTotalShipment = (
+  totalWeightNumber: number,
+  costPerKgInTshs: number,
+  costPerKgInUsd: number
+) => {
+  const totalShipmentInTshs = costPerKgInTshs * totalWeightNumber;
+  const totalShipmentInUsd = costPerKgInUsd * totalWeightNumber;
+
+  return { totalShipmentInTshs, totalShipmentInUsd };
+};
+
+const changeAmountPaid = (
+  amountPaid: number,
+  exchangeRate: number,
+  currency: CURRENCY
+) => {
+  if (currency === CURRENCY.USD) {
+    const amountPaidInTshs = amountPaid * exchangeRate;
+    return { amountPaidInTshs, amountPaidInUsd: amountPaid };
+  }
+  const amountPaidInUsd = amountPaid / exchangeRate;
+  return { amountPaidInTshs: amountPaid, amountPaidInUsd };
 };

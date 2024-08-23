@@ -4,7 +4,12 @@ export enum POSITION {
 }
 
 export enum STATUS {
-  NOT_PAID = "Not Paid",
+  // NOT_PAID = "Not Paid",
   PARTIALLY_PAID = "Partially Paid",
   PAID = "Paid in Full",
+}
+
+export enum CURRENCY {
+  TSHS = "TSHS",
+  USD = "USD",
 }
