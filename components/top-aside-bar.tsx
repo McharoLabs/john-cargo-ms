@@ -176,9 +176,7 @@ const TopAsideBar = () => {
             <li>
               <Link
                 href="/home/customers"
-                className={`${
-                  session?.user.isSuperUser ? "flex" : "hidden"
-                } items-center p-2 text-gray-900 rounded-lg  ${
+                className={`flex items-center p-2 text-gray-900 rounded-lg  ${
                   pathname === "/home/customers" ? "bg-gray-100" : ""
                 } hover:bg-gray-100 group`}
               >
