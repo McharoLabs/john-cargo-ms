@@ -14,43 +14,37 @@ import { formatDate } from "@/lib/utils";
 
 const UsersClientTable = ({ data }: { data: Customer[] }) => {
   return (
-    <div className="overflow-x-auto">
-      <Table className="min-w-full">
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead className="hidden sm:table-cell">Code Number</TableHead>
-            <TableHead className="hidden md:table-cell">Contact</TableHead>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Name</TableHead>
+          <TableHead>Code Number</TableHead>
+          <TableHead>Contact</TableHead>
 
-            <TableHead className="hidden md:table-cell">Created At</TableHead>
+          <TableHead>Created At</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {data.map((user, index) => (
+          <TableRow key={index}>
+            <TableCell>
+              <div className="font-medium">{user.name as string}</div>
+              <div className="hidden text-sm text-muted-foreground md:inline">
+                {user.email}
+              </div>
+            </TableCell>
+            <TableCell>{user.codeNumber}</TableCell>
+            <TableCell>
+              <Badge className="text-xs" variant="secondary">
+                {user.contact}
+              </Badge>
+            </TableCell>
+
+            <TableCell>{formatDate(user.createdAt)}</TableCell>
           </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.map((user, index) => (
-            <TableRow key={index}>
-              <TableCell>
-                <div className="font-medium">{user.name as string}</div>
-                <div className="hidden text-sm text-muted-foreground md:inline">
-                  {user.email}
-                </div>
-              </TableCell>
-              <TableCell className="hidden sm:table-cell">
-                {user.codeNumber}
-              </TableCell>
-              <TableCell className="hidden sm:table-cell">
-                <Badge className="text-xs" variant="secondary">
-                  {user.contact}
-                </Badge>
-              </TableCell>
-
-              <TableCell className="hidden md:table-cell">
-                {formatDate(user.createdAt)}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+        ))}
+      </TableBody>
+    </Table>
   );
 };
 

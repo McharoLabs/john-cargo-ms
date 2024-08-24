@@ -1,10 +1,18 @@
 import React from "react";
 
-const Loader = ({ message }: { message: string }) => {
+interface LoaderProps {
+  message: string;
+  spinnerColor?: string;
+}
+
+const Loader: React.FC<LoaderProps> = ({
+  message,
+  spinnerColor = "text-white",
+}) => {
   return (
     <div className="flex items-center justify-center">
       <svg
-        className="w-5 h-5 mr-2 text-white animate-spin"
+        className={`w-5 h-5 mr-2 ${spinnerColor} animate-spin`}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"

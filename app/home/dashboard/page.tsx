@@ -230,7 +230,7 @@ const Dashboard = () => {
         </div>
 
         <Card x-chunk="dashboard-06-chunk-0">
-          <CardHeader className="flex flex-row items-center">
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center">
             <div className="flex flex-col">
               <div className="text-xl font-semibold">Receipts </div>
               <div className="text-muted-foreground">
