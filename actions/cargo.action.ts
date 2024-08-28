@@ -8,7 +8,7 @@ import {
   CargoFormSchemaType,
   CargoReceiptValidationResult,
 } from "@/lib/types";
-import { desc, eq, or, sql } from "drizzle-orm";
+import { and, desc, eq, or, sql } from "drizzle-orm";
 
 export const addCargo = async (data: CargoFormSchemaType) => {
   try {
@@ -129,9 +129,32 @@ export const fetchCargoReceipts = async (search: string = "") => {
           sql`${userTable.contact} ILIKE ${searchTerm}`
         )
       )
-      .orderBy(desc(cargoTable.postingDate));
+      .orderBy(desc(cargoTable.createdAt));
 
     return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchCargoReceipt = async (cargoId: string) => {
+  try {
+    const result = await db
+      .select({
+        cargo: cargoTable,
+        users: {
+          codeNumber: userTable.codeNumber,
+          name: sql`${userTable.firstName} || ' ' || ${userTable.lastName} AS name`,
+          email: userTable.email,
+          contact: userTable.contact,
+          createdAt: userTable.createdAt,
+        },
+      })
+      .from(cargoTable)
+      .innerJoin(userTable, eq(cargoTable.codeNumber, userTable.codeNumber))
+      .where(eq(cargoTable.cargoId, cargoId));
+
+    return result[0];
   } catch (error) {
     throw error;
   }

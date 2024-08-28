@@ -106,6 +106,7 @@ interface Cargo {
   outstanding: string | null;
   balance: string | null;
   status: string;
+  paymentCurrency: string;
   shipped: boolean;
   received: boolean;
   createdAt: Date;

@@ -14,13 +14,18 @@ export default auth((req) => {
   if (!req.auth && reqUrl.pathname !== "/auth/signin") {
     return NextResponse.redirect(
       new URL(
-        `/api/auth/signin?callbackUrl=${encodeURIComponent(reqUrl?.pathname)}`,
+        `/api/auth/signin?callbackUrl=${encodeURIComponent(reqUrl.pathname)}`,
         req.url
       )
     );
   }
 
-  if (!req.auth?.user.isSuperUser && reqUrl.pathname === "/home/users") {
+  if (
+    req.auth &&
+    req.auth.user &&
+    !req.auth.user.isSuperUser &&
+    reqUrl.pathname === "/home/users"
+  ) {
     return NextResponse.redirect(new URL("/auth/401", req.url));
   }
 

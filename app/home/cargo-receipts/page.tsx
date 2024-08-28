@@ -21,7 +21,7 @@ import { downloadExcel } from "@/actions/export-doc.action";
 import Loader from "@/components/loader";
 
 const CargoReceiptsPage = () => {
-  const [loading, setisLoading] = React.useState<boolean>(false);
+  const [loading, setIsLoading] = React.useState<boolean>(false);
   const [downloadLoading, setDownloadLoading] = React.useState<boolean>(false);
   const [cargoReceipts, setCargoReceipts] = React.useState<CargoReceipts[]>([]);
 
@@ -30,14 +30,14 @@ const CargoReceiptsPage = () => {
   }, []);
 
   const getCargoreceipts = async (search: string = "") => {
-    setisLoading(true);
+    setIsLoading(true);
     try {
       const data = await fetchCargoReceipts(search);
       setCargoReceipts(data ?? []);
-      setisLoading(false);
+      setIsLoading(false);
     } catch (error) {
       console.error(error);
-      setisLoading(false);
+      setIsLoading(false);
     }
   };
 
