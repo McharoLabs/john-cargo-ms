@@ -8,7 +8,7 @@ import {
   CargoFormSchemaType,
   CargoReceiptValidationResult,
 } from "@/lib/types";
-import { and, desc, eq, or, sql } from "drizzle-orm";
+import { and, count, desc, eq, or, sql } from "drizzle-orm";
 
 export const addCargo = async (data: CargoFormSchemaType) => {
   try {
@@ -104,9 +104,14 @@ export const addCargo = async (data: CargoFormSchemaType) => {
   }
 };
 
-export const fetchCargoReceipts = async (search: string = "") => {
+export const fetchCargoReceipts = async (
+  search: string = "",
+  page: number = 1,
+  itemsPerPage: number = 10
+) => {
   try {
     const searchTerm = `%${search.toLowerCase()}%`;
+    const offset = (page - 1) * itemsPerPage;
 
     const result = await db
       .select({
@@ -129,7 +134,9 @@ export const fetchCargoReceipts = async (search: string = "") => {
           sql`${userTable.contact} ILIKE ${searchTerm}`
         )
       )
-      .orderBy(desc(cargoTable.createdAt));
+      .orderBy(desc(cargoTable.createdAt))
+      .limit(itemsPerPage)
+      .offset(offset);
 
     return result;
   } catch (error) {
@@ -205,6 +212,16 @@ export const received = async (cargoId: string) => {
 
     return { success: true, detail: "Shipped successfully" };
   } catch (error) {
+    throw error;
+  }
+};
+
+export const countReceipts = async () => {
+  try {
+    const totalReceipts = await db.select({ count: count() }).from(cargoTable);
+    return totalReceipts[0];
+  } catch (error) {
+    console.log(`Error while counting receipts: ${error}`);
     throw error;
   }
 };

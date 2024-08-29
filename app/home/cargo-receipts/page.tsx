@@ -10,34 +10,67 @@ import {
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
 import { File, Search } from "lucide-react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import CargoClientForm from "@/components/new-cargo-form.client";
 import CargoReceiptsTable from "@/components/cargo-receipt-table";
-import { fetchCargoReceipts } from "@/actions/cargo.action";
+import { countReceipts, fetchCargoReceipts } from "@/actions/cargo.action";
 import { CargoReceipts } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { downloadExcel } from "@/actions/export-doc.action";
 import Loader from "@/components/loader";
 
+const itemsPerPage = 2;
+
 const CargoReceiptsPage = () => {
   const [loading, setIsLoading] = React.useState<boolean>(false);
   const [downloadLoading, setDownloadLoading] = React.useState<boolean>(false);
   const [cargoReceipts, setCargoReceipts] = React.useState<CargoReceipts[]>([]);
+  const [totalReceipts, setTotalReceipts] = React.useState<number>(0);
+  const [currentPage, setCurrentPage] = React.useState<number>(1);
+
+  const totalPages = Math.ceil(totalReceipts / itemsPerPage);
+
+
+   const getCargoreceipts = React.useCallback(
+     async (search: string = "") => {
+       setIsLoading(true);
+       try {
+         const data = await fetchCargoReceipts(
+           search,
+           currentPage,
+           itemsPerPage
+         );
+         setCargoReceipts(data ?? []);
+         setIsLoading(false);
+       } catch (error) {
+         console.error(error);
+         setIsLoading(false);
+       }
+     },
+     [currentPage]
+   );
+
 
   React.useEffect(() => {
     getCargoreceipts();
-  }, []);
+    getTotalReceipts();
+  }, [currentPage, getCargoreceipts]);
 
-  const getCargoreceipts = async (search: string = "") => {
-    setIsLoading(true);
+ 
+
+  const getTotalReceipts = async () => {
     try {
-      const data = await fetchCargoReceipts(search);
-      setCargoReceipts(data ?? []);
-      setIsLoading(false);
+      const { count } = await countReceipts();
+      setTotalReceipts(count);
     } catch (error) {
-      console.error(error);
-      setIsLoading(false);
+      console.log(error);
+      setTotalReceipts(0);
     }
   };
 
@@ -51,10 +84,17 @@ const CargoReceiptsPage = () => {
       setDownloadLoading(false);
     }
   };
+
+  const handlePageChange = (page: number) => {
+    if (page > 0 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
   return (
-    <div className=" flex place-content-center ">
-      <div className=" w-full space-y-10">
-        <Breadcrumb className="hidden md:flex ">
+    <div className="flex place-content-center">
+      <div className="w-full space-y-10">
+        <Breadcrumb className="hidden md:flex">
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
@@ -77,14 +117,14 @@ const CargoReceiptsPage = () => {
             <Button
               size="sm"
               variant="outline"
-              className="h-8 "
+              className="h-8"
               onClick={exportToXLSX}
               disabled={downloadLoading}
             >
               {downloadLoading ? (
                 <Loader message="Downloading..." spinnerColor="text-gray-900" />
               ) : (
-                <div className="flex flex-row items-center gap-1 ">
+                <div className="flex flex-row items-center gap-1">
                   <File className="h-3.5 w-3.5" />
                   <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                     Export
@@ -96,7 +136,7 @@ const CargoReceiptsPage = () => {
 
           <Card x-chunk="dashboard-05-chunk-3">
             <CardHeader className="px-7">
-              <div className="relative ml-auto flex-1 md:grow-0 ">
+              <div className="relative ml-auto flex-1 md:grow-0">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   onInput={(event) => {
@@ -119,6 +159,41 @@ const CargoReceiptsPage = () => {
                 />
               )}
             </CardContent>
+            <CardFooter>
+              <div className="flex flex-col gap-3 md:flex-row md:justify-between items-center ">
+                <span className="text-sm text-gray-600 ">
+                  Showing {(currentPage - 1) * itemsPerPage + 1} -{" "}
+                  {Math.min(currentPage * itemsPerPage, totalReceipts)} of{" "}
+                  {totalReceipts} Receipts
+                </span>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => handlePageChange(1)}
+                    disabled={currentPage === 1}
+                  >
+                    First
+                  </Button>
+                  <Button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    Prev
+                  </Button>
+                  <Button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </Button>
+                  <Button
+                    onClick={() => handlePageChange(totalPages)}
+                    disabled={currentPage === totalPages}
+                  >
+                    Last
+                  </Button>
+                </div>
+              </div>
+            </CardFooter>
           </Card>
         </div>
       </div>

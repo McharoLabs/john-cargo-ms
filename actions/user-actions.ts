@@ -1,7 +1,7 @@
 "use server";
 import { cargoTable, staffTable, userTable } from "@/db/schema";
 import { db } from "@/db";
-import { and, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, count, desc, eq, isNull, sql } from "drizzle-orm";
 import { RegistrationSchema, RegistrationSchemaType } from "@/lib/types";
 import { genSaltSync, hashSync } from "bcrypt-ts";
 
@@ -118,9 +118,15 @@ export async function fetchStaffs(search: string = "") {
   }
 }
 
-export async function fetchCustomers(search: string = "") {
+export async function fetchCustomers(
+  search: string = "",
+  page: number = 1,
+  itemsPerPage: number = 10
+) {
   try {
     const searchTerm = `%${search.toLowerCase()}%`;
+    const offset = (page - 1) * itemsPerPage;
+
     const us = await db
       .select({
         codeNumber: userTable.codeNumber,
@@ -137,7 +143,9 @@ export async function fetchCustomers(search: string = "") {
           isNull(staffTable.staffId)
         )
       )
-      .orderBy(desc(userTable.codeNumber));
+      .orderBy(desc(userTable.createdAt))
+      .limit(itemsPerPage)
+      .offset(offset);
 
     return us;
   } catch (error) {

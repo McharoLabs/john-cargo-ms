@@ -20,21 +20,23 @@ const ReceiptDetailsPage = () => {
   const [cargoReceipts, setCargoReceipts] =
     React.useState<CargoReceipts | null>(null);
 
+     const getCargoreceipt = React.useCallback(async () => {
+       setIsLoading(true);
+       try {
+         const data = await fetchCargoReceipt(params.id as string);
+         setCargoReceipts(data ?? null);
+         setIsLoading(false);
+       } catch (error) {
+         console.error(error);
+         setIsLoading(false);
+       }
+     }, [params.id]);
+
   React.useEffect(() => {
     getCargoreceipt();
-  }, []);
+  }, [getCargoreceipt]);
 
-  const getCargoreceipt = async () => {
-    setIsLoading(true);
-    try {
-      const data = await fetchCargoReceipt(params.id as string);
-      setCargoReceipts(data ?? null);
-      setIsLoading(false);
-    } catch (error) {
-      console.error(error);
-      setIsLoading(false);
-    }
-  };
+ 
 
   return (
     <div className="flex place-content-center">

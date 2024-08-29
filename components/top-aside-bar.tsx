@@ -1,6 +1,13 @@
 "use client";
 
 import { signOut } from "@/auth/helper";
+import {
+  LayoutDashboard,
+  Power,
+  ReceiptText,
+  Users,
+  UsersRound,
+} from "lucide-react";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -151,206 +158,65 @@ const TopAsideBar = () => {
         aria-label="Sidebar"
       >
         <div className="h-full px-3 pb-4 overflow-y-auto">
-          <ul className="space-y-2 font-medium">
-            <li>
-              <Link
-                href="/home/dashboard"
-                className={`flex items-center p-2 text-gray-900 rounded-lg  ${
-                  pathname === "/home/dashboard" ? "bg-graye-100" : ""
-                } hover:bg-gray-100 group`}
-              >
-                <svg
-                  className="w-5 h-5 text-blue-500 transition duration-75 group-hover:text-blue-700"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 22 21"
-                >
-                  <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
-                  <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
-                </svg>
-                <span className="ms-3">Dashboard</span>
-              </Link>
-            </li>
+          <div className="grid items-start px-2 text-sm font-medium lg:px-4">
+            <Link
+              href="/home/dashboard"
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${
+                pathname === "/home/dashboard" ? "bg-gray-100 text-primary" : ""
+              }`}
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              Dashboard
+            </Link>
 
-            <li>
-              <Link
-                href="/home/customers"
-                className={`flex items-center p-2 text-gray-900 rounded-lg  ${
-                  pathname === "/home/customers" ? "bg-gray-100" : ""
-                } hover:bg-gray-100 group`}
-              >
-                <svg
-                  className="w-5 h-5 text-blue-500 transition duration-75 group-hover:text-blue-700"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
-                  />
-                </svg>
+            <Link
+              href="/home/customers"
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${
+                pathname === "/home/customers" ? "bg-gray-100 text-primary" : ""
+              }`}
+            >
+              <Users className="h-4 w-4" />
+              Customers
+            </Link>
 
-                <span className="ms-3">Customers</span>
-              </Link>
-            </li>
+            <Link
+              href="/home/cargo-receipts"
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${
+                pathname === "/home/cargo-receipts"
+                  ? "bg-gray-100 text-primary"
+                  : ""
+              }`}
+            >
+              <ReceiptText className="h-4 w-4" />
+              Receipts
+            </Link>
 
-            <li>
-              <Link
-                href="/home/cargo-receipts"
-                className={` flex items-center p-2 text-gray-900 rounded-lg  ${
-                  pathname === "/home/cargo-receipts" ? "bg-gray-100" : ""
-                } hover:bg-gray-100 group`}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-6 h-6 text-blue-500 transition duration-75 group-hover:text-blue-700"
-                >
-                  <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
-                  <path d="m9 12 2 2 4-4" />
-                </svg>
+            <Link
+              href="/home/users"
+              className={` items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary ${
+                pathname === "/home/users"
+                  ? "bg-gray-100 text-primary"
+                  : !session?.user.isSuperUser
+                  ? "hidden"
+                  : "flex"
+              }`}
+            >
+              <UsersRound className="h-4 w-4" />
+              Users
+            </Link>
 
-                <span className="ms-3">Receipts</span>
-              </Link>
-            </li>
-
-            <li>
-              <Link
-                href="/home/users"
-                className={`${
-                  session?.user.isSuperUser ? "flex" : "hidden"
-                } items-center p-2 text-gray-900 rounded-lg  ${
-                  pathname === "/home/users" ? "bg-gray-100" : ""
-                } hover:bg-gray-100 group`}
-              >
-                <svg
-                  className="w-5 h-5 text-blue-500 transition duration-75 group-hover:text-blue-700"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
-                  />
-                </svg>
-
-                <span className="ms-3">Users</span>
-              </Link>
-            </li>
-
-            {/* <li>
-              <Link
-                onClick={toggleNavDropdown}
-                className={` ${
-                  session?.user.isSuperUser ? "hidden" : "flex"
-                } items-center p-2 text-gray-900 rounded-lg  ${
-                  pathname === "/home/cargo" ? "bg-gray-100" : ""
-                } hover:bg-gray-100 group`}
-                href={""}
-              >
-                <svg
-                  className="w-6 h-6 text-blue-500 transition duration-75 group-hover:text-blue-700"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    d="M3 13h1v6H3v-6zm16 0h1v6h-1v-6zM4 9h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2zM6 15h1v1H6v-1zM10 15h1v1h-1v-1zM14 15h1v1h-1v-1zM18 15h1v1h-1v-1zM4 7v2h16V7H4zM4 11v2h16v-2H4z"
-                  />
-                </svg>
-
-                <span className="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">
-                  Cargo Receipts
-                </span>
-
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-chevron-down"
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              </Link>
-              <ul
-                className={`py-2 space-y-2 ${
-                  isNavDropdownOpen ? "block" : "hidden"
-                }`}
-              >
-                <Link
-                  href={`${"/home/cargo-receipt/new"}`}
-                  onClick={toggleNavDropdown}
-                  className={`flex items-center p-2 pl-8 text-gray-900 rounded-lg hover:bg-gray-100 group`}
-                >
-                  <span className="ms-3">New Receipt</span>
-                </Link>
-                <Link
-                  href={`${"/home/cargo-receipt/all"}`}
-                  onClick={toggleNavDropdown}
-                  className={`flex items-center p-2 pl-8 text-gray-900 rounded-lg hover:bg-gray-100 group`}
-                >
-                  <span className="ms-3">All Receipt</span>
-                </Link>
-              </ul>
-            </li> */}
-
-            <li>
-              <Link
-                href=""
-                onClick={async () => {
-                  await signOut();
-                  window.location.reload();
-                }}
-                className={`flex items-center p-2 text-gray-900 rounded-lg   hover:bg-gray-100 group`}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-log-out text-blue-500 transition duration-75 group-hover:text-blue-700"
-                >
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                  <polyline points="16 17 21 12 16 7" />
-                  <line x1="21" x2="9" y1="12" y2="12" />
-                </svg>
-
-                <span className="ms-3">Sign Out</span>
-              </Link>
-            </li>
-          </ul>
+            <Link
+              href=""
+              onClick={async () => {
+                await signOut();
+                window.location.reload();
+              }}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary `}
+            >
+              <Power className="h-4 w-4" />
+              Sign Out
+            </Link>
+          </div>
         </div>
       </aside>
     </div>

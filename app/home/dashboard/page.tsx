@@ -9,7 +9,12 @@ import {
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
 import { CargoReceipts } from "@/lib/types";
-import { fetchCargoReceipts, received, shipped } from "@/actions/cargo.action";
+import {
+  countReceipts,
+  fetchCargoReceipts,
+  received,
+  shipped,
+} from "@/actions/cargo.action";
 
 import { MoreHorizontal, Search, Users, WalletCards } from "lucide-react";
 
@@ -49,12 +54,21 @@ import {
   countStaffs,
 } from "@/actions/user-actions";
 import { useRouter } from "next/navigation";
+import Spinner from "@/components/spinner";
+import CargoReceiptsTable from "@/components/cargo-receipt-table";
+
+const itemsPerPage = 15;
 
 const Dashboard = () => {
   const { toast } = useToast();
   const router = useRouter();
+  const [loading, setIsLoading] = React.useState<boolean>(false);
   const [staffCount, setStaffCount] = React.useState<number>(0);
   const [customerCount, setCustomerCount] = React.useState<number>(0);
+  const [totalReceipts, setTotalReceipts] = React.useState<number>(0);
+  const [currentPage, setCurrentPage] = React.useState<number>(1);
+
+  const totalPages = Math.ceil(totalReceipts / itemsPerPage);
   const [paymentStatuses, setPaymentStatuses] = React.useState<{
     notPaid: number;
     partiallyPaid: number;
@@ -64,23 +78,34 @@ const Dashboard = () => {
     partiallyPaid: 0,
     paidInFull: 0,
   });
-  const [CargoReceipts, setCargoReceipts] = React.useState<CargoReceipts[]>([]);
+  const [cargoReceipts, setCargoReceipts] = React.useState<CargoReceipts[]>([]);
+
+  const getCargoreceipts = React.useCallback(
+    async (search: string = "") => {
+      setIsLoading(true);
+      try {
+        const data = await fetchCargoReceipts(
+          search,
+          currentPage,
+          itemsPerPage
+        );
+        setCargoReceipts(data ?? []);
+        setIsLoading(false);
+      } catch (error) {
+        console.error(error);
+        setIsLoading(false);
+      }
+    },
+    [currentPage]
+  );
 
   React.useEffect(() => {
-    getCargosWithCustomers();
     getStaffCount();
     getCustomerCount();
     getPaymentStatus();
-  }, []);
-
-  const getCargosWithCustomers = async (search: string = "") => {
-    try {
-      const data = await fetchCargoReceipts(search);
-      setCargoReceipts(data ?? []);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+    getCargoreceipts();
+    getTotalReceipts();
+  }, [currentPage, getCargoreceipts]);
 
   const getStaffCount = async () => {
     try {
@@ -109,50 +134,22 @@ const Dashboard = () => {
     }
   };
 
-  const setReceived = async (cargoId: string) => {
+  const getTotalReceipts = async () => {
     try {
-      const res = await received(cargoId);
-      if (!res.success) {
-        toast({
-          title: "Detail",
-          description: res.detail,
-          variant: "destructive",
-        });
-        return;
-      }
-      toast({
-        title: "Detail",
-        description: res.detail,
-        className: "bg-green-500 text-white text-lg",
-      });
-      getCargosWithCustomers();
+      const { count } = await countReceipts();
+      setTotalReceipts(count);
     } catch (error) {
-      console.error(error);
+      console.log(error);
+      setTotalReceipts(0);
     }
   };
 
-  const setShipped = async (cargoId: string) => {
-    try {
-      const res = await shipped(cargoId);
-
-      if (res.success === false) {
-        toast({
-          title: "Detail",
-          description: res.detail,
-          variant: "destructive",
-        });
-        return;
-      }
-      toast({
-        title: "Detail",
-        description: res.detail,
-        className: "bg-green-500 text-white text-lg",
-      });
-      getCargosWithCustomers();
-    } catch (error) {
-      console.error(error);
+  const handlePageChange = (page: number) => {
+    if (page > 0 && page <= totalPages) {
+      setCurrentPage(page);
     }
   };
+
   return (
     <div className=" flex place-content-center ">
       <div className="w-full space-y-10">
@@ -244,7 +241,7 @@ const Dashboard = () => {
               <Input
                 onInput={(event) => {
                   const inputValue = (event.target as HTMLInputElement).value;
-                  getCargosWithCustomers(inputValue);
+                  getCargoreceipts(inputValue);
                 }}
                 type="search"
                 placeholder="Search..."
@@ -253,167 +250,15 @@ const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Code Number</TableHead>
-                  <TableHead>Posting Date</TableHead>
-                  <TableHead>Total Box</TableHead>
-                  <TableHead>Total Weight</TableHead>
-                  <TableHead>Cost Per Kg</TableHead>
-                  <TableHead>Total Shipment (USD)</TableHead>
-                  <TableHead>Exchange Rate</TableHead>
-                  <TableHead>Total Shipment (Tshs)</TableHead>
-                  <TableHead>Amount Paid</TableHead>
-                  <TableHead>Credit Amount</TableHead>
-                  <TableHead>Outstanding</TableHead>
-                  <TableHead>Balance</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Shipped</TableHead>
-                  <TableHead>Received</TableHead>
-                  {/* <TableHead>Created At</TableHead>
-                  <TableHead>Updated At</TableHead> */}
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {CargoReceipts.map((cargo, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{cargo.users.name as string}</TableCell>
-                    <TableCell>{cargo.cargo.codeNumber}</TableCell>
-                    <TableCell>{formatDate(cargo.cargo.postingDate)}</TableCell>
-                    <TableCell>{cargo.cargo.totalBox}</TableCell>
-                    <TableCell>{cargo.cargo.totalWeight}</TableCell>
-                    <TableCell>{cargo.cargo.costPerKg}</TableCell>
-                    <TableCell>{cargo.cargo.totalShipmentUSD}</TableCell>
-                    <TableCell>{cargo.cargo.exchangeRate}</TableCell>
-                    <TableCell>{cargo.cargo.totalShipmentTshs}</TableCell>
-                    <TableCell>{cargo.cargo.amountPaid}</TableCell>
-                    <TableCell>{cargo.cargo.creditAmount || "N/A"}</TableCell>
-                    <TableCell>{cargo.cargo.outstanding || "N/A"}</TableCell>
-                    <TableCell>{cargo.cargo.balance || "N/A"}</TableCell>
-                    <TableCell>{cargo.cargo.status}</TableCell>
-                    <TableCell>
-                      {cargo.cargo.shipped ? (
-                        <Badge className="bg-green-500">Yes</Badge>
-                      ) : (
-                        <Badge className="bg-red-500">No</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {cargo.cargo.received ? (
-                        <Badge className="bg-green-500">Yes</Badge>
-                      ) : (
-                        <Badge className="bg-red-500">No</Badge>
-                      )}
-                    </TableCell>
-                    {/* <TableCell>{formatDate(cargo.cargo.createdAt)}</TableCell>
-                    <TableCell>
-                      {cargo.cargo.updatedAt
-                        ? formatDate(cargo.cargo.updatedAt)
-                        : "-"}
-                    </TableCell> */}
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            aria-haspopup="true"
-                            size="icon"
-                            variant="ghost"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                            <span className="sr-only">Toggle menu</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem
-                            onClick={() => setShipped(cargo.cargo.cargoId)}
-                            className="space-x-3"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="14"
-                              height="14"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="lucide lucide-circle-arrow-out-down-right text-blue-500"
-                            >
-                              <path d="M12 22a10 10 0 1 1 10-10" />
-                              <path d="M22 22 12 12" />
-                              <path d="M22 16v6h-6" />
-                            </svg>
-                            <span>Shipped</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setReceived(cargo.cargo.cargoId);
-                            }}
-                            className="space-x-3"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="14"
-                              height="14"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="lucide lucide-hand-coins text-blue-500"
-                            >
-                              <path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17" />
-                              <path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9" />
-                              <path d="m2 16 6 6" />
-                              <circle cx="16" cy="9" r="2.9" />
-                              <circle cx="6" cy="5" r="3" />
-                            </svg>
-                            <span>Received</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              router.push(
-                                `/home/receipt-details/${cargo.cargo.cargoId}`
-                              )
-                            }
-                            className="space-x-3"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="14"
-                              height="14"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="lucide lucide-eye text-blue-500"
-                            >
-                              <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
-                              <circle cx="12" cy="12" r="3" />
-                            </svg>
-                            <span>View</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            {loading ? (
+              <Spinner />
+            ) : (
+              <CargoReceiptsTable
+                cargoReceipts={cargoReceipts}
+                callback={getCargoreceipts}
+              />
+            )}
           </CardContent>
-          <CardFooter>
-            <div className="text-xs text-muted-foreground">
-              Showing <strong>1-10</strong> of <strong>32</strong> products
-            </div>
-          </CardFooter>
         </Card>
       </div>
     </div>
