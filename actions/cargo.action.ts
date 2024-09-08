@@ -117,8 +117,11 @@ export const fetchCargoReceipts = async (
       .select({
         cargo: cargoTable,
         users: {
+          userId: userTable.userId,
           codeNumber: userTable.codeNumber,
           name: sql`${userTable.firstName} || ' ' || ${userTable.lastName} AS name`,
+          firstName: userTable.firstName,
+          lastName: userTable.lastName,
           email: userTable.email,
           contact: userTable.contact,
           createdAt: userTable.createdAt,
@@ -150,6 +153,9 @@ export const fetchCargoReceipt = async (cargoId: string) => {
       .select({
         cargo: cargoTable,
         users: {
+          userId: userTable.userId,
+          firstName: userTable.firstName,
+          lastName: userTable.lastName,
           codeNumber: userTable.codeNumber,
           name: sql`${userTable.firstName} || ' ' || ${userTable.lastName} AS name`,
           email: userTable.email,
@@ -166,6 +172,80 @@ export const fetchCargoReceipt = async (cargoId: string) => {
     throw error;
   }
 };
+
+export const fetchCustomerReceipts = async (
+  userId: string,
+  search: string = "",
+  page: number = 1,
+  itemsPerPage: number = 10
+) => {
+  try {
+    const searchTerm = `%${search.toLowerCase()}%`;
+    const offset = (page - 1) * itemsPerPage;
+
+    const result = await db
+      .select({
+        cargo: cargoTable,
+        users: {
+          userId: userTable.userId,
+          codeNumber: userTable.codeNumber,
+          name: sql`${userTable.firstName} || ' ' || ${userTable.lastName}`.as("name"),
+          firstName: userTable.firstName,
+          lastName: userTable.lastName,
+          email: userTable.email,
+          contact: userTable.contact,
+          createdAt: userTable.createdAt,
+        },
+      })
+      .from(cargoTable)
+      .innerJoin(userTable, eq(cargoTable.codeNumber, userTable.codeNumber))
+      .where(
+        and(
+
+          or(
+            sql`${cargoTable.codeNumber} ILIKE ${searchTerm}`,
+            sql`${userTable.firstName} || ' ' || ${userTable.lastName} ILIKE ${searchTerm}`,
+            sql`${userTable.email} ILIKE ${searchTerm}`,
+            sql`${userTable.contact} ILIKE ${searchTerm}`
+          ),
+          eq(userTable.userId, userId)
+        )
+      )
+      .orderBy(desc(cargoTable.createdAt))
+      .limit(itemsPerPage)
+      .offset(offset);
+
+    return result;
+} catch (error) {
+  console.error(error)
+  throw error;
+}
+}
+
+export const fetchCustomerBalance = async (
+  userId: string,
+) => {
+  try {
+
+    const result = await db
+      .select({
+        balance: cargoTable.balance,
+        cargoId: cargoTable.cargoId
+      })
+      .from(cargoTable)
+      .innerJoin(userTable, eq(cargoTable.codeNumber, userTable.codeNumber))
+      .where(
+        eq(userTable.userId, userId)
+      )
+      .orderBy(desc(cargoTable.createdAt))
+      .limit(1);
+
+    return result[0];
+} catch (error) {
+  console.error(error)
+  throw error;
+}
+}
 
 export const shipped = async (cargoId: string) => {
   try {
@@ -219,6 +299,16 @@ export const received = async (cargoId: string) => {
 export const countReceipts = async () => {
   try {
     const totalReceipts = await db.select({ count: count() }).from(cargoTable);
+    return totalReceipts[0];
+  } catch (error) {
+    console.log(`Error while counting receipts: ${error}`);
+    throw error;
+  }
+};
+
+export const countCustomerReceipts = async (userId: string) => {
+  try {
+    const totalReceipts = await db.select({ count: count() }).from(cargoTable).innerJoin(userTable, eq(cargoTable.codeNumber, userTable.codeNumber)).where(eq(userTable.userId, userId));
     return totalReceipts[0];
   } catch (error) {
     console.log(`Error while counting receipts: ${error}`);

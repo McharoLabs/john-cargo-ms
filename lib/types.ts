@@ -91,7 +91,7 @@ export interface SelectOption {
   label: string;
 }
 
-interface Cargo {
+export interface Cargo {
   cargoId: string;
   codeNumber: string;
   postingDate: Date;
@@ -114,8 +114,11 @@ interface Cargo {
 }
 
 export interface Customer {
+  userId: string;
   codeNumber: string;
   name: unknown;
+  firstName: string;
+  lastName: string;
   email: string;
   contact: string;
   createdAt: Date;

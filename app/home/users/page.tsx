@@ -74,7 +74,7 @@ const UsersPage = () => {
             </div>
           </CardHeader>
           <CardContent>
-            {loading ? <Spinner /> : <UsersClientTable data={userData} />}
+            {loading ? <Spinner /> : <UsersClientTable data={userData} staff={true} />}
           </CardContent>
         </Card>
       </div>

@@ -104,7 +104,7 @@ const CustomersPage = () => {
             </div>
           </CardHeader>
           <CardContent>
-            {loading ? <Spinner /> : <UsersClientTable data={userData} />}
+            {loading ? <Spinner /> : <UsersClientTable data={userData} staff={false}/>}
           </CardContent>
           <CardFooter>
             <div className="flex flex-col gap-3 md:flex-row md:justify-between items-center ">

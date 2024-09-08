@@ -2,7 +2,7 @@
 import { cargoTable, staffTable, userTable } from "@/db/schema";
 import { db } from "@/db";
 import { and, count, desc, eq, isNull, sql } from "drizzle-orm";
-import { RegistrationSchema, RegistrationSchemaType } from "@/lib/types";
+import { Customer, RegistrationSchema, RegistrationSchemaType } from "@/lib/types";
 import { genSaltSync, hashSync } from "bcrypt-ts";
 
 async function getLastCustomerCode(): Promise<string | null> {
@@ -99,6 +99,9 @@ export async function fetchStaffs(search: string = "") {
 
     const staffUsers = await db
       .select({
+        userId: userTable.userId,
+        firstName: userTable.firstName,
+        lastName: userTable.lastName,
         codeNumber: userTable.codeNumber,
         name: sql`${userTable.firstName} || ' ' || ${userTable.lastName} AS name`,
         email: userTable.email,
@@ -129,6 +132,9 @@ export async function fetchCustomers(
 
     const us = await db
       .select({
+        userId: userTable.userId,
+        firstName: userTable.firstName,
+        lastName: userTable.lastName,
         codeNumber: userTable.codeNumber,
         name: sql`${userTable.firstName} || ' ' || ${userTable.lastName} AS name`,
         email: userTable.email,
@@ -148,6 +154,81 @@ export async function fetchCustomers(
       .offset(offset);
 
     return us;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function updateCustomer(data: RegistrationSchemaType) {
+  try {
+    const result = RegistrationSchema.safeParse(data);
+    if (!result.success) {
+      return { success: false, issues: result.error.issues, detail: null };
+    }
+
+    const existingUser = await db.query.userTable.findFirst({
+      where: eq(userTable.email, data.email),
+    });
+
+    if (!existingUser) {
+      return {
+        success: false,
+        detail: `Customer Not Found`,
+      };
+    }
+
+
+    if (data.codeNumber) {
+      await db.update(userTable)
+        .set({
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          contact: data.contact,
+          updatedAt: new Date(),
+        })
+        .where(eq(userTable.codeNumber, data.codeNumber))
+        .execute();
+    } else {
+      throw new Error("codeNumber is required to update the user.");
+    }
+
+    const message =  "Customer updated successful";
+
+    return { detail: message, success: true };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function fetchCustomer(
+  userId: string,
+) {
+  try {
+
+    const us = await db
+      .select({
+        userId: userTable.userId,
+        firstName: userTable.firstName,
+        lastName: userTable.lastName,
+        codeNumber: userTable.codeNumber,
+        name: sql`${userTable.firstName} || ' ' || ${userTable.lastName} AS name`,
+        email: userTable.email,
+        contact: userTable.contact,
+        createdAt: userTable.createdAt,
+      })
+      .from(userTable)
+      .leftJoin(staffTable, eq(userTable.userId, staffTable.staffId))
+      .where(
+        and(
+          eq(userTable.userId, userId),
+          isNull(staffTable.staffId)
+        )
+      );
+
+
+    return us[0];
   } catch (error) {
     throw error;
   }

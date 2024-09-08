@@ -39,7 +39,6 @@ const CargoReceiptsPage = () => {
 
    const getCargoreceipts = React.useCallback(
      async (search: string = "") => {
-       setIsLoading(true);
        try {
          const data = await fetchCargoReceipts(
            search,
@@ -47,10 +46,8 @@ const CargoReceiptsPage = () => {
            itemsPerPage
          );
          setCargoReceipts(data ?? []);
-         setIsLoading(false);
        } catch (error) {
          console.error(error);
-         setIsLoading(false);
        }
      },
      [currentPage]
