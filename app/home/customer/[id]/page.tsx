@@ -66,6 +66,7 @@ const CustomerDetailPage = () => {
     try {
       const data = await fetchCustomer(params.id as string);
       setCustomer(data);
+      setUpdateKey((prev) => prev + 1);
     } catch (error) {
       console.error(error);
     }
@@ -101,7 +102,6 @@ const CustomerDetailPage = () => {
 
   const callback = () => {
     getCustomer();
-    setUpdateKey((prev) => prev + 1);
   };
 
   return (
