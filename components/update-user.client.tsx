@@ -78,11 +78,11 @@ const UpdateUserClientForm: React.FC<UpdateUserClientFormProps> = ({
     getCustomerBalance();
   }, [getCustomerBalance]);
 
-  const onSubmit: SubmitHandler<RegistrationSchemaType> = async (data) => {
+  const onSubmit: SubmitHandler<RegistrationSchemaType> = async (details) => {
     setDetail(null);
     setIsLoading(true);
     try {
-      const res = await updateCustomer(data);
+      const res = await updateCustomer(details);
       setIsLoading(false);
 
       if (res && res.success === false) {
@@ -248,26 +248,6 @@ const UpdateUserClientForm: React.FC<UpdateUserClientFormProps> = ({
                             {...field}
                             type="tel"
                           />
-                        </FormControl>
-
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <FormField
-                    disabled={disabled}
-                    control={form.control}
-                    name="codeNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Code Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="" {...field} />
                         </FormControl>
 
                         <FormMessage />

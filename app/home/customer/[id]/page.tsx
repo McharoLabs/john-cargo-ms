@@ -38,6 +38,7 @@ const CustomerDetailPage = () => {
   const [cargoReceipts, setCargoReceipts] = React.useState<CargoReceipts[]>([]);
   const [totalReceipts, setTotalReceipts] = React.useState<number>(0);
   const [currentPage, setCurrentPage] = React.useState<number>(1);
+  const [updateKey, setUpdateKey] = React.useState<number>(0);
 
   const totalPages = Math.ceil(totalReceipts / itemsPerPage);
 
@@ -49,18 +50,18 @@ const CustomerDetailPage = () => {
           params.id as string,
           search,
           currentPage,
-          itemsPerPage 
+          itemsPerPage
         );
         setIsLoading(false);
+
         setCargoReceipts(data ?? []);
       } catch (error) {
         setIsLoading(false);
       }
     },
-    [params.id, currentPage]
+    [currentPage, params.id]
   );
-  
-  
+
   const getCustomer = React.useCallback(async () => {
     try {
       const data = await fetchCustomer(params.id as string);
@@ -68,8 +69,8 @@ const CustomerDetailPage = () => {
     } catch (error) {
       console.error(error);
     }
-  }, [params.id]); 
-  
+  }, [params.id]);
+
   const getTotalReceipts = React.useCallback(async () => {
     try {
       const { count } = await countCustomerReceipts(params.id as string);
@@ -78,20 +79,13 @@ const CustomerDetailPage = () => {
       console.log(error);
       setTotalReceipts(0);
     }
-  }, [params.id]); 
-  
+  }, [params.id]);
+
   React.useEffect(() => {
     getTotalReceipts();
     getCustomerReceipts();
     getCustomer();
-  }, [getCustomer, getCustomerReceipts, getTotalReceipts]);
-  
-  React.useEffect(() => {
-    if (customer) {
-      setFirstLoad(false);
-    }
-  }, [customer]);
-  
+  }, [params, getCustomerReceipts, getCustomer, getTotalReceipts]);
 
   const handlePageChange = (page: number) => {
     if (page > 0 && page <= totalPages) {
@@ -99,6 +93,16 @@ const CustomerDetailPage = () => {
     }
   };
 
+  React.useEffect(() => {
+    if (customer) {
+      setFirstLoad(false);
+    }
+  }, [customer]);
+
+  const callback = () => {
+    getCustomer();
+    setUpdateKey((prev) => prev + 1);
+  };
 
   return (
     <div className="flex place-content-center">
@@ -124,8 +128,13 @@ const CustomerDetailPage = () => {
         ) : (
           <>
             {customer && (
-              <UpdateUserClientForm callback={getCustomer} data={customer} />
+              <UpdateUserClientForm
+                key={updateKey}
+                callback={callback}
+                data={customer}
+              />
             )}
+
             {customer && (
               <Card x-chunk="dashboard-05-chunk-3">
                 <CardHeader className="px-7">
