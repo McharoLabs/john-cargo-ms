@@ -1,27 +1,28 @@
-import { createUser } from "@/actions/user-actions";
+import { create } from "@/actions/staff.action";
+import { StaffsSchemaType } from "@/lib/z.schema";
 
 async function main() {
-  const userData = {
+  const userData: StaffsSchemaType = {
     firstName: "John",
     lastName: "Cargo",
     email: "john@gmail.com",
     contact: "0717251140",
-    isStaff: true,
+    isSuperUser: true,
   };
 
   try {
-    const result = await createUser(userData);
+    const result = await create(userData);
 
     if (result.success) {
       console.log(result.detail);
       process.exit();
     } else {
-      console.error("User creation failed:", result.detail, result.issues);
+      console.error("Failed to create staff:", result.detail, result.issues);
       process.exit();
     }
   } catch (error) {
-    console.error("An error occurred:", error);
-    process.exit();
+    console.error("Failed to create staff:", error);
+    process.exit(1);
   }
 }
 

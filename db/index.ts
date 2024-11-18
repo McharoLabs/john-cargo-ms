@@ -1,9 +1,11 @@
-import { drizzle } from "drizzle-orm/vercel-postgres/driver";
-import * as schema from "./schema";
-import { sql } from "@vercel/postgres";
-import { loadEnvConfig } from "@next/env";
+// db.ts
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
+import { config } from "dotenv";
+import * as schema from "@/db/schema";
 
-const projectDir = process.cwd();
-loadEnvConfig(projectDir, true);
+config({ path: ".env.local" });
 
-export const db = drizzle(sql, { schema });
+const sql = neon(process.env.POSTGRES_URL!);
+
+export const db = drizzle(sql, { logger: true, schema });
