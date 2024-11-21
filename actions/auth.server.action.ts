@@ -1,6 +1,9 @@
 "use server";
 import { signIn } from "@/auth";
-import { LoginFormSchema, LoginFormSchemaType } from "@/types/z.schema";
+import {
+  LoginFormSchema,
+  LoginFormSchemaType,
+} from "@/lib/z-schema/staff.schema";
 import { AuthError } from "next-auth";
 import { ZodError } from "zod";
 

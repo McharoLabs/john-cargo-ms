@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import { BasicAppShell } from "@/components/app-shell";
+import BasicAppShell from "@/components/app-shell";
 import { SessionProvider } from "next-auth/react";
 import React from "react";
 

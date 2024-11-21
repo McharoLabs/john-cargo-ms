@@ -1,5 +1,12 @@
 import { z } from "zod";
 
+export const LoginFormSchema = z.object({
+  email: z.string().email({ message: "Invaid email address" }).trim(),
+  password: z.string().trim(),
+});
+
+export type LoginFormSchemaType = z.infer<typeof LoginFormSchema>;
+
 export const StaffsSchema = z.object({
   firstName: z
     .string()

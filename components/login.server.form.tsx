@@ -15,8 +15,8 @@ import {
 } from "@mantine/core";
 import classes from "../style/AuthenticationTitle.module.css";
 import { useForm } from "@mantine/form";
-import { LoginFormSchemaType } from "@/types/z.schema";
 import { loginAction } from "@/actions/auth.server.action";
+import { LoginFormSchemaType } from "@/lib/z-schema/staff.schema";
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -61,16 +61,15 @@ export function LoginForm() {
 
   return (
     <Container size={420} my={40}>
+      <Title ta="center" className={classes.title}>
+        Welcome back!
+      </Title>
       <Box pos="relative">
         <LoadingOverlay
           visible={isLoading}
           zIndex={1000}
           overlayProps={{ radius: "sm", blur: 2 }}
         />
-
-        <Title ta="center" className={classes.title}>
-          Welcome back!
-        </Title>
 
         <form onSubmit={form.onSubmit(handleLogin)}>
           <Paper withBorder shadow="md" p={30} mt={30} radius="md">
