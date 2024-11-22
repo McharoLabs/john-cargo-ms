@@ -9,7 +9,7 @@ import {
   integer,
   AnyPgColumn,
 } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { InferSelectModel, relations } from "drizzle-orm";
 
 export const staffs = pgTable("staffs", {
   staffId: uuid("staff_id").primaryKey().notNull().unique().defaultRandom(),
@@ -25,6 +25,8 @@ export const staffs = pgTable("staffs", {
     .defaultNow()
     .$onUpdate(() => new Date()),
 });
+
+export type Staff = InferSelectModel<typeof staffs>;
 
 export const customers = pgTable("customers", {
   customerId: uuid("customer_id")
