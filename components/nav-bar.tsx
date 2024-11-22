@@ -1,49 +1,26 @@
 import {
-  IconAdjustments,
-  IconCalendarStats,
-  IconFileAnalytics,
   IconGauge,
   IconLock,
-  IconNotes,
-  IconPresentationAnalytics,
+  IconReceipt,
+  IconUsers,
+  IconUserStar,
 } from "@tabler/icons-react";
 import { ScrollArea } from "@mantine/core";
 import classes from "../style/NavbarNested.module.css";
 import { UserButton } from "./user-button";
-import { LinksGroup } from "./links-group";
+import { LinksGroup, LinksGroupProps } from "./links-group";
 
-const mockdata = [
-  { label: "Dashboard", icon: IconGauge },
-  {
-    label: "Market news",
-    icon: IconNotes,
-    initiallyOpened: true,
-    links: [
-      { label: "Overview", link: "/" },
-      { label: "Forecasts", link: "/" },
-      { label: "Outlook", link: "/" },
-      { label: "Real time", link: "/" },
-    ],
-  },
-  {
-    label: "Releases",
-    icon: IconCalendarStats,
-    links: [
-      { label: "Upcoming releases", link: "/" },
-      { label: "Previous releases", link: "/" },
-      { label: "Releases schedule", link: "/" },
-    ],
-  },
-  { label: "Analytics", icon: IconPresentationAnalytics },
-  { label: "Contracts", icon: IconFileAnalytics },
-  { label: "Settings", icon: IconAdjustments },
+const mockdata: LinksGroupProps[] = [
+  { label: "Dashboard", icon: IconGauge, link: "/home/dashboard" },
+  { label: "Customers", icon: IconUsers, link: "/home/customers" },
+  { label: "Staffs", icon: IconUserStar, link: "/home/staffs" },
+  { label: "Receipts", icon: IconReceipt, link: "/home/receipts" },
   {
     label: "Security",
     icon: IconLock,
     links: [
-      { label: "Enable 2FA", link: "/" },
-      { label: "Change password", link: "/" },
-      { label: "Recovery codes", link: "/" },
+      { label: "Change password", link: "/home/security/change-password" },
+      { label: "Recovery codes", link: "/home/security/recovery-codes" },
     ],
   },
 ];

@@ -1,8 +1,20 @@
 import { IconChevronRight } from "@tabler/icons-react";
 import { Avatar, Group, Text, UnstyledButton } from "@mantine/core";
 import classes from "../style/UserButton.module.css";
+import { useSession } from "next-auth/react";
+import React from "react";
+import { redirect } from "next/navigation";
 
 export function UserButton() {
+  const { data: session, status } = useSession();
+
+  React.useEffect(() => {
+    if (status === "loading") return;
+    if (!session) {
+      redirect("/api/auth/signin");
+    }
+  }, [session, status]);
+
   return (
     <UnstyledButton className={classes.user}>
       <Group>
@@ -10,11 +22,11 @@ export function UserButton() {
 
         <div style={{ flex: 1 }}>
           <Text size="sm" fw={500}>
-            Harriette Spoonlicker
+            {session?.user.name}
           </Text>
 
           <Text c="dimmed" size="xs">
-            hspoonlicker@outlook.com
+            {session?.user.email}
           </Text>
         </div>
 
