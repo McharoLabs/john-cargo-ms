@@ -1,8 +1,9 @@
+"use server";
 import { db } from "@/db";
-import { staffs } from "@/db/schema";
+import { Staff, staffs } from "@/db/schema";
 import { StaffsSchema, StaffsSchemaType } from "@/lib/z-schema/staff.schema";
 import { genSaltSync, hashSync } from "bcrypt-ts";
-import { eq } from "drizzle-orm";
+import { eq, ne } from "drizzle-orm";
 
 export async function create(input: StaffsSchemaType) {
   try {
@@ -40,7 +41,22 @@ export async function create(input: StaffsSchemaType) {
 
     return { detail: "Staff added successfully", success: true };
   } catch (error) {
-    console.error(error);
+    console.error(
+      `Error while creating user ${JSON.stringify(input)}: ${error}`
+    );
     throw error;
   }
 }
+
+export const getAll = async (): Promise<Staff[]> => {
+  try {
+    const result = await db.query.staffs.findMany({
+      where: ne(staffs.isSuperUser, true),
+    });
+
+    return result;
+  } catch (error) {
+    console.error(`Error while fatching all staffs: ${error}`);
+    throw error;
+  }
+};
