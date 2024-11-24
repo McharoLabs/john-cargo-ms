@@ -1,6 +1,5 @@
 import { DefaultSession, NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { appConfig } from "./config/app.config";
 
 export const authConfig: NextAuthConfig = {
   providers: [
@@ -16,7 +15,7 @@ export const authConfig: NextAuthConfig = {
       },
     }),
   ],
-  secret: appConfig.secret,
+  secret: process.env.AUTH_SECRET,
   pages: { signIn: "/login" },
   callbacks: {
     jwt: ({ token, user }) => {
