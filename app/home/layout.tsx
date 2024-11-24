@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import BasicAppShell from "@/components/app-shell";
 import { SessionProvider } from "next-auth/react";
 import React from "react";
+import { appConfig } from "@/config/app.config";
 
 export default async function HomeLayout({
   children,
@@ -21,7 +22,7 @@ export default async function HomeLayout({
     };
   }
   return (
-    <SessionProvider basePath={process.env.BASE_PATH} session={session}>
+    <SessionProvider basePath={appConfig.basePath} session={session}>
       <BasicAppShell>{children}</BasicAppShell>
     </SessionProvider>
   );
