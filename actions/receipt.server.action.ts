@@ -106,7 +106,7 @@ export const receiptBasicCalculations = async ({
   const status =
     outstanding === 0
       ? PaymentStatusEnum.PAID
-      : outstanding < 0 && totalPaidInUsdgit === 0
+      : outstanding < 0 && totalPaidInUsd === 0
       ? PaymentStatusEnum.UNPAID
       : PaymentStatusEnum.PARTIAALY_PAID;
 
