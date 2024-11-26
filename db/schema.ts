@@ -7,7 +7,6 @@ import {
   uuid,
   pgEnum,
   integer,
-  AnyPgColumn,
 } from "drizzle-orm/pg-core";
 import { InferSelectModel, relations } from "drizzle-orm";
 
@@ -16,7 +15,7 @@ export const staffs = pgTable("staffs", {
   firstName: varchar("first_name", { length: 50 }).notNull(),
   lastName: varchar("last_name", { length: 50 }).notNull(),
   email: varchar("email", { length: 255 }).unique().notNull(),
-  contact: varchar("contact", { length: 50 }).notNull(),
+  contact: varchar("contact", { length: 50 }).notNull().unique(),
   password: varchar("password", { length: 255 }),
   isSuperUser: boolean("is_super_user").default(false).notNull(),
   department: varchar("department", { length: 255 }),
@@ -37,8 +36,8 @@ export const customers = pgTable("customers", {
   codeNumber: varchar("code_number", { length: 50 }).notNull().unique(),
   firstName: varchar("first_name", { length: 50 }).notNull(),
   lastName: varchar("last_name", { length: 50 }).notNull(),
-  email: varchar("email", { length: 255 }).unique().notNull(),
-  contact: varchar("contact", { length: 50 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  contact: varchar("contact", { length: 50 }).notNull().unique(),
   region: varchar("region").notNull(),
   district: varchar("district").notNull(),
   addedBy: uuid("added_by")
@@ -51,10 +50,12 @@ export const customers = pgTable("customers", {
     .$onUpdate(() => new Date()),
 });
 
+export type Customer = InferSelectModel<typeof customers>;
+
 export const receiptStatusEnum = pgEnum("receipt_status", [
-  "Not Paid",
   "Partially Paid",
-  "Paid in Full",
+  "Paid",
+  "Unpaid",
 ]);
 
 export const currency = pgTable("currency", {
@@ -63,10 +64,10 @@ export const currency = pgTable("currency", {
     .notNull()
     .unique()
     .defaultRandom(),
-  currency_code: varchar("currency_code", { length: 3 }).notNull(),
-  currency_name: varchar("currency_name", { length: 50 }).notNull(),
-  symbol: varchar("symbol", { length: 5 }).notNull(),
-  exchange_rate: decimal("exchange_rate", {
+  currency_code: varchar("currency_code", { length: 3 }).notNull().unique(),
+  currency_name: varchar("currency_name", { length: 50 }).notNull().unique(),
+  symbol: varchar("symbol", { length: 5 }).notNull().unique(),
+  rate_to_tzs: decimal("rate_to_tzs", {
     precision: 10,
     scale: 4,
   }).notNull(),
@@ -75,11 +76,9 @@ export const currency = pgTable("currency", {
     .notNull()
     .defaultNow()
     .$onUpdate(() => new Date()),
-  base_currency_id: uuid("base_currency_id").references(
-    (): AnyPgColumn => currency.currency_id,
-    { onDelete: "set null" }
-  ),
 });
+
+export type Currency = InferSelectModel<typeof currency>;
 
 export const receipts = pgTable("receipt", {
   receiptId: uuid("receipt_id").primaryKey().notNull().unique().defaultRandom(),
@@ -90,7 +89,7 @@ export const receipts = pgTable("receipt", {
   totalBox: integer("total_box").notNull(),
   totalWeight: decimal("total_weight", { precision: 10, scale: 2 }).notNull(),
   costPerKg: decimal("cost_per_kg", { precision: 10, scale: 2 }).notNull(),
-  costPerKyCurrency: varchar("costPerKyCurency").notNull(),
+  costPerKgCurrency: varchar("cost_per_kg_currency").notNull(),
   totalShipmentUSD: decimal("total_shipment_usd", {
     precision: 10,
     scale: 2,

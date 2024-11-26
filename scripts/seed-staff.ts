@@ -8,6 +8,7 @@ async function main() {
     email: "john@gmail.com",
     contact: "0717251140",
     isSuperUser: true,
+    department: null,
   };
 
   try {

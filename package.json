@@ -9,7 +9,8 @@
     "lint": "next lint",
     "generate": "drizzle-kit generate",
     "migrate": "npx tsx ./db/migrate.ts",
-    "seed": "npx tsx scripts/seed.ts",
+    "seed_staff": "npx tsx scripts/seed-staff.ts",
+    "seed_currency": "npx tsx scripts/seed-currency.ts",
     "studio": "drizzle-kit studio"
   },
   "dependencies": {

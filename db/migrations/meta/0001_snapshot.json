@@ -1,6 +1,6 @@
 {
-  "id": "7febdab0-3ed4-4c68-b9e4-817227ea503d",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "3546b2f8-9753-476e-bc2d-b08f8d9b5251",
+  "prevId": "7febdab0-3ed4-4c68-b9e4-817227ea503d",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -249,8 +249,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "costPerKyCurency": {
-          "name": "costPerKyCurency",
+        "cost_per_kg_currency": {
+          "name": "cost_per_kg_currency",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true

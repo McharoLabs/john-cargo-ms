@@ -1,4 +1,4 @@
-CREATE TYPE "public"."receipt_status" AS ENUM('Not Paid', 'Partially Paid', 'Paid in Full');--> statement-breakpoint
+CREATE TYPE "public"."receipt_status" AS ENUM('Partially Paid', 'Paid', 'Unpaid');--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "currency" (
 	"currency_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"currency_code" varchar(3) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS "customers" (
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "customers_customer_id_unique" UNIQUE("customer_id"),
 	CONSTRAINT "customers_code_number_unique" UNIQUE("code_number"),
-	CONSTRAINT "customers_email_unique" UNIQUE("email")
+	CONSTRAINT "customers_contact_unique" UNIQUE("contact")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "receipt" (
@@ -64,7 +64,8 @@ CREATE TABLE IF NOT EXISTS "staffs" (
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now(),
 	CONSTRAINT "staffs_staff_id_unique" UNIQUE("staff_id"),
-	CONSTRAINT "staffs_email_unique" UNIQUE("email")
+	CONSTRAINT "staffs_email_unique" UNIQUE("email"),
+	CONSTRAINT "staffs_contact_unique" UNIQUE("contact")
 );
 --> statement-breakpoint
 DO $$ BEGIN

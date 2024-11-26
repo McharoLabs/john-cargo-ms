@@ -1,4 +1,4 @@
-import { LoginForm } from "@/components/login.server.form";
+import { LoginForm } from "@/components/login.form";
 import React from "react";
 
 const LoginPage = async () => {

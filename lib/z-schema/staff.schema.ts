@@ -45,7 +45,7 @@ export const StaffsSchema = z.object({
   department: z
     .string()
     .max(255, { message: "Department name must be 255 characters or less" })
-    .optional(),
+    .nullable(),
 });
 
 export type StaffsSchemaType = z.infer<typeof StaffsSchema>;

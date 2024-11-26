@@ -1,0 +1,1 @@
+ALTER TABLE "receipt" RENAME COLUMN "costPerKyCurency" TO "cost_per_kg_currency";

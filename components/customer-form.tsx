@@ -1,35 +1,38 @@
 "use client";
-import React from "react";
-import { TextInput, Checkbox, Button, Paper, Title, Grid } from "@mantine/core";
+import {
+  CustomerSchema,
+  CustomerSchemaType,
+} from "@/lib/z-schema/customer.schema";
 import { useForm, zodResolver } from "@mantine/form";
-import { StaffsSchema, StaffsSchemaType } from "@/lib/z-schema/staff.schema";
-import { create } from "@/actions/staff.server.action";
+import React from "react";
 import {
   showLoadingNotification,
   updateErrorNotification,
   updateSuccessNotification,
 } from "./notificationUtils";
+import { create } from "@/actions/customer.server.action";
+import { Button, Grid, Paper, TextInput, Title } from "@mantine/core";
 
-function StaffFormPage() {
+const CustomerForm = () => {
   const [isLoading, setIsLoading] = React.useState(false);
 
   // Initialize form with validation
-  const form = useForm<StaffsSchemaType>({
+  const form = useForm<CustomerSchemaType>({
     initialValues: {
       firstName: "",
       lastName: "",
-      email: "",
       contact: "",
-      isSuperUser: false,
-      department: null,
+      email: "",
+      region: "",
+      district: "",
     },
-    validate: zodResolver(StaffsSchema),
+    validate: zodResolver(CustomerSchema),
   });
 
-  const handleSubmit = async (values: StaffsSchemaType) => {
+  const handleSubmit = async (values: CustomerSchemaType) => {
     setIsLoading(true);
     const notificationProps = {
-      id: "staff-form-submission",
+      id: "customer-form-submission",
       title: "Submitting your form",
       message: "Please wait...",
     };
@@ -48,7 +51,7 @@ function StaffFormPage() {
       } else if (result.issues) {
         result.issues.forEach((issue) => {
           form.setFieldError(
-            issue.path[0] as keyof StaffsSchemaType,
+            issue.path[0] as keyof CustomerSchemaType,
             issue.message
           );
         });
@@ -76,11 +79,10 @@ function StaffFormPage() {
       setIsLoading(false);
     }
   };
-
   return (
     <div>
       <Title ta="start" mb="lg" size={24}>
-        Add New Staff
+        Add New Customer
       </Title>
 
       <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -104,16 +106,6 @@ function StaffFormPage() {
             </Grid.Col>
             <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
               <TextInput
-                label="Email"
-                placeholder="Enter email"
-                type="email"
-                required
-                {...form.getInputProps("email")}
-              />
-            </Grid.Col>
-
-            <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
-              <TextInput
                 label="Contact"
                 type="tel"
                 placeholder="Enter contact number"
@@ -121,19 +113,29 @@ function StaffFormPage() {
                 {...form.getInputProps("contact")}
               />
             </Grid.Col>
-
             <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
               <TextInput
-                label="Department"
-                placeholder="Enter department (optional)"
-                {...form.getInputProps("department")}
+                label="Email"
+                placeholder="Enter email"
+                type="email"
+                required
+                {...form.getInputProps("email")}
               />
             </Grid.Col>
-
-            <Grid.Col>
-              <Checkbox
-                label="Is Super User"
-                {...form.getInputProps("isSuperUser", { type: "checkbox" })}
+            <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
+              <TextInput
+                label="Region"
+                placeholder="Enter region"
+                required
+                {...form.getInputProps("region")}
+              />
+            </Grid.Col>
+            <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
+              <TextInput
+                label="District"
+                placeholder="Enter district"
+                required
+                {...form.getInputProps("district")}
               />
             </Grid.Col>
 
@@ -147,6 +149,6 @@ function StaffFormPage() {
       </form>
     </div>
   );
-}
+};
 
-export default StaffFormPage;
+export default CustomerForm;
