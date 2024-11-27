@@ -29,6 +29,20 @@
       "when": 1732650298561,
       "tag": "0003_blushing_wallop",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1732713189890,
+      "tag": "0004_lean_pyro",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1732719054428,
+      "tag": "0005_sturdy_lizard",
+      "breakpoints": true
     }
   ]
 }

@@ -87,23 +87,29 @@ export const receipts = pgTable("receipt", {
     .notNull(),
   postingDate: timestamp("posting_date").notNull(),
   totalBox: integer("total_box").notNull(),
-  totalWeight: decimal("total_weight", { precision: 10, scale: 2 }).notNull(),
-  costPerKg: decimal("cost_per_kg", { precision: 10, scale: 2 }).notNull(),
+  totalWeight: decimal("total_weight", { precision: 30, scale: 15 }).notNull(),
+  costPerKg: decimal("cost_per_kg", { precision: 30, scale: 15 }).notNull(),
   costPerKgCurrency: varchar("cost_per_kg_currency").notNull(),
   totalShipmentUSD: decimal("total_shipment_usd", {
     precision: 10,
     scale: 2,
   }).notNull(),
-  exchangeRate: decimal("exchange_rate", { precision: 10, scale: 2 }).notNull(),
   totalShipmentTshs: decimal("total_shipment_tshs", {
     precision: 10,
     scale: 2,
   }).notNull(),
-  amountPaid: decimal("amount_paid", { precision: 10, scale: 2 }).notNull(),
+  totalPaidInTzs: decimal("total_paid_in_tzs", {
+    precision: 30,
+    scale: 15,
+  }).notNull(),
+  totalPaidInUsd: decimal("total_paid_in_usd", {
+    precision: 30,
+    scale: 15,
+  }).notNull(),
   paymentCurrency: varchar("payment_currency").notNull(),
-  creditAmount: decimal("credit_amount", { precision: 10, scale: 2 }),
-  outstanding: decimal("outstanding", { precision: 10, scale: 2 }),
-  balance: decimal("balance", { precision: 10, scale: 2 }),
+  creditAmount: decimal("credit_amount", { precision: 30, scale: 15 }),
+  outstanding: decimal("outstanding", { precision: 30, scale: 15 }),
+  balance: decimal("balance", { precision: 30, scale: 15 }),
   status: receiptStatusEnum("status").notNull().default("Partially Paid"),
   shipped: boolean("shipped").default(false).notNull(),
   received: boolean("received").default(false).notNull(),
@@ -113,6 +119,8 @@ export const receipts = pgTable("receipt", {
     .defaultNow()
     .$onUpdate(() => new Date()),
 });
+
+export type Receipt = InferSelectModel<typeof receipts>;
 
 export const customersRelation = relations(customers, ({ many }) => ({
   receipts: many(receipts),

@@ -9,18 +9,44 @@ import { db } from "@/db";
 import { receipts } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { PaymentStatusEnum } from "@/lib/enum/payment-status-enum";
-// import { ZodError } from "zod";
+import { ZodError } from "zod";
+import { formatMoney } from "@/lib/utils/functions";
 
 export const createReceipt = async (input: ReceiptSchemaType) => {
   try {
-    // const zodError = new ZodError([]);
-
     const result = ReceiptSchema.safeParse(input);
     if (!result.success) {
       return { success: false, issues: result.error.issues };
     }
 
-    return { seccess: true, detail: "" };
+    type PaymentStatus = "Paid" | "Partially Paid" | "Unpaid";
+
+    const savedReceipt = await db
+      .insert(receipts)
+      .values({
+        codeNumber: input.codeNumber,
+        costPerKg: String(input.costPerKg),
+        costPerKgCurrency: String(input.costPerKgCurrency),
+        paymentCurrency: input.paymentCurrency,
+        postingDate: new Date(String(input.postingDate)),
+        totalPaidInTzs: String(input.totalPaidInTzs),
+        totalPaidInUsd: String(input.totalPaidInUsd),
+        totalShipmentTshs: String(input.totalShipmentTshs),
+        totalBox: Number(input.totalBox),
+        totalShipmentUSD: String(input.totalShipmentUSD),
+        totalWeight: String(input.totalWeight),
+        balance: input.balance ? String(input.balance) : null,
+        creditAmount: input.creditAmount ? String(input.creditAmount) : null,
+        outstanding: input.outstanding ? String(input.outstanding) : null,
+        received: input.received,
+        shipped: input.shipped,
+        status: input.status as PaymentStatus,
+      })
+      .returning();
+
+    console.info(`Saved Receipt: ${savedReceipt}`);
+
+    return { success: true, detail: "Receipt created successfully." };
   } catch (error) {
     console.error(`Error while creating new receipt: ${error}`);
     throw error;
@@ -39,7 +65,7 @@ const getCustomerLastReceipt = async ({
       .where(eq(receipts.codeNumber, codeNumber))
       .orderBy(desc(receipts.createdAt))
       .limit(1);
-
+    console.info(`Customer Last Receipt: ${JSON.stringify(result[0])}`);
     return result[0];
   } catch (error) {
     console.error(`Error while getting customer last balance: ${error}`);
@@ -60,12 +86,12 @@ export const receiptBasicCalculations = async ({
   totalWeight: number;
   costPerKg: number;
   costPerKgCurrency: string;
-  amountPaid: string;
+  amountPaid: number;
   paymentCurrency: string;
 }) => {
   let costPerKgRateToTzs: string = "1";
   let amountPaidRateToTzs: string = "1";
-
+  console.log("Clicked");
   // Convert cost per kg to TZS if it's not already in TZS
   if (costPerKgCurrency !== BaseCurrencyEnum.TZS) {
     const costData = await getCurrency({ currency_code: costPerKgCurrency });
@@ -80,10 +106,10 @@ export const receiptBasicCalculations = async ({
 
   // Calculate the total shipment in the original currency
   const totalCost = totalWeight * costPerKg;
-  const totalAmountPaid = parseFloat(amountPaid);
+  const totalAmountPaid = amountPaid;
 
   // Convert to TZS if needed
-  const totalCostInTzs =
+  const totalShipmentTshs =
     costPerKgCurrency !== BaseCurrencyEnum.TZS
       ? totalCost * parseFloat(costPerKgRateToTzs)
       : totalCost;
@@ -97,32 +123,59 @@ export const receiptBasicCalculations = async ({
   const usdToTzsRate = (
     await getCurrency({ currency_code: BaseCurrencyEnum.USD })
   ).rate_to_tzs;
-  const totalCostInUsd = totalCostInTzs / parseFloat(usdToTzsRate);
+  const totalShipmentUSD = totalShipmentTshs / parseFloat(usdToTzsRate);
   const totalPaidInUsd = totalPaidInTzs / parseFloat(usdToTzsRate);
 
   // Calculate the balance
-  const outstanding = totalCostInUsd - totalPaidInUsd;
+  const outstanding = totalShipmentTshs - totalPaidInTzs;
+
+  if (outstanding < 0) {
+    const zodError = new ZodError([]);
+    zodError.addIssue({
+      code: "custom",
+      message: `The amount exceeds ${formatMoney(
+        (totalShipmentTshs - totalPaidInTzs) * -1
+      )}Tzs of total cost`,
+      path: ["amountPaid"],
+    });
+    return { data: null, issues: zodError.errors };
+  }
 
   const status =
     outstanding === 0
       ? PaymentStatusEnum.PAID
-      : outstanding < 0 && totalPaidInUsd === 0
+      : totalPaidInUsd === 0
       ? PaymentStatusEnum.UNPAID
       : PaymentStatusEnum.PARTIAALY_PAID;
 
-  const prevReceipt = await getCustomerLastReceipt({ codeNumber: codeNumber });
-  const creditAmount = prevReceipt.balance;
+  try {
+    const prevReceipt = await getCustomerLastReceipt({
+      codeNumber: codeNumber,
+    });
 
-  const balance = outstanding + (!creditAmount ? Number(creditAmount) : 0);
+    let creditAmount: string | null = null;
+    if (prevReceipt) {
+      creditAmount = prevReceipt.balance;
+    }
 
-  return {
-    totalCostInTzs,
-    totalPaidInTzs,
-    totalCostInUsd,
-    totalPaidInUsd,
-    status,
-    balance,
-    creditAmount,
-    outstanding,
-  };
+    const balance = outstanding + (creditAmount ? Number(creditAmount) : 0);
+
+    return {
+      data: {
+        totalShipmentTshs,
+        totalPaidInTzs,
+        totalShipmentUSD,
+        totalPaidInUsd,
+        status,
+        balance,
+        creditAmount,
+        outstanding,
+        costPerKgExchangeRate: costPerKgRateToTzs,
+        paymentCurrencyExchangeRate: amountPaidRateToTzs,
+        usdExchangeRate: usdToTzsRate,
+      },
+    };
+  } catch (error) {
+    throw error;
+  }
 };

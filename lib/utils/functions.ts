@@ -16,3 +16,10 @@ export function formatDateToYYYYMMDD(dateString: string): string {
     return "Invalid date";
   }
 }
+
+export function formatMoney(value: number): string {
+  return value.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}

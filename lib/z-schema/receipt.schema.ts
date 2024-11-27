@@ -4,7 +4,7 @@ import { PaymentStatusArray } from "../array/payment-status-array";
 export const ReceiptSchema = z.object({
   receiptId: z.string().uuid().optional(),
   codeNumber: z.string().max(50),
-  postingDate: z.string().datetime(),
+  postingDate: z.date().nullable(),
   totalBox: z.number().int().min(0).nullable(),
   totalWeight: z
     .number()
@@ -22,17 +22,22 @@ export const ReceiptSchema = z.object({
     .positive()
     .or(z.string().regex(/^\d+(\.\d{1,2})?$/))
     .nullable(),
-  exchangeRate: z
-    .number()
-    .positive()
-    .or(z.string().regex(/^\d+(\.\d{1,2})?$/))
-    .nullable(),
   totalShipmentTshs: z
     .number()
     .positive()
     .or(z.string().regex(/^\d+(\.\d{1,2})?$/))
     .nullable(),
   amountPaid: z
+    .number()
+    .positive()
+    .or(z.string().regex(/^\d+(\.\d{1,2})?$/))
+    .nullable(),
+  totalPaidInTzs: z
+    .number()
+    .positive()
+    .or(z.string().regex(/^\d+(\.\d{1,2})?$/))
+    .nullable(),
+  totalPaidInUsd: z
     .number()
     .positive()
     .or(z.string().regex(/^\d+(\.\d{1,2})?$/))
