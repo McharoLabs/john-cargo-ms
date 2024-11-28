@@ -6,11 +6,13 @@ import {
 import { getCurrency } from "./currency.server.action";
 import { BaseCurrencyEnum } from "@/lib/enum/base-currency-enum.enum";
 import { db } from "@/db";
-import { receipts } from "@/db/schema";
+import { receipts, ReceiptWithRelations } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { PaymentStatusEnum } from "@/lib/enum/payment-status-enum";
 import { ZodError } from "zod";
 import { formatMoney } from "@/lib/utils/functions";
+import { auth } from "@/auth";
+import { signOut } from "@/auth/helper";
 
 export const createReceipt = async (input: ReceiptSchemaType) => {
   try {
@@ -20,6 +22,15 @@ export const createReceipt = async (input: ReceiptSchemaType) => {
     }
 
     type PaymentStatus = "Paid" | "Partially Paid" | "Unpaid";
+
+    const staff = await auth();
+    if (!staff || !staff.user) {
+      await signOut();
+      window.location.reload();
+      return { success: false, detail: "User is not authenticated" };
+    }
+
+    console.debug(`Staff creating customer: ${JSON.stringify(staff)}`);
 
     const savedReceipt = await db
       .insert(receipts)
@@ -44,7 +55,11 @@ export const createReceipt = async (input: ReceiptSchemaType) => {
         outstanding: input.outstanding ? String(input.outstanding) : null,
         received: input.received,
         shipped: input.shipped,
+        costPerKgExchangeRate: String(input.costPerKgExchangeRate),
+        paymentCurrencyExchangeRate: String(input.paymentCurrencyExchangeRate),
+        usdExchangeRate: String(input.usdExchangeRate),
         status: input.status as PaymentStatus,
+        customerCareId: staff.user.id,
       })
       .returning();
 
@@ -53,6 +68,23 @@ export const createReceipt = async (input: ReceiptSchemaType) => {
     return { success: true, detail: "Receipt created successfully." };
   } catch (error) {
     console.error(`Error while creating new receipt: ${error}`);
+    throw error;
+  }
+};
+
+export const getAllReceipts = async (): Promise<ReceiptWithRelations[]> => {
+  try {
+    const allReceipts = await db.query.receipts.findMany({
+      orderBy: desc(receipts.createdAt),
+      with: {
+        customer: true,
+        staff: true,
+      },
+    });
+
+    return allReceipts;
+  } catch (error) {
+    console.error(`Error while getting all receipts: ${error}`);
     throw error;
   }
 };

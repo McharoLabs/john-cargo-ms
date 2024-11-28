@@ -1,12 +1,15 @@
 import ReceiptForm from "@/components/receipt-form";
-import { Container } from "@mantine/core";
+import ReceiptTable from "@/components/receipt-table";
+import { Space } from "@mantine/core";
 import React from "react";
 
 const ReceiptsPage = () => {
   return (
-    <Container size={"xl"} p={0}>
+    <div>
       <ReceiptForm />
-    </Container>
+      <Space h={"lg"} />
+      <ReceiptTable />
+    </div>
   );
 };
 

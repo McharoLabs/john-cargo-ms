@@ -82,6 +82,11 @@ export type Currency = InferSelectModel<typeof currency>;
 
 export const receipts = pgTable("receipt", {
   receiptId: uuid("receipt_id").primaryKey().notNull().unique().defaultRandom(),
+  customerCareId: uuid("customer_care_id")
+    .references(() => staffs.staffId, {
+      onDelete: "restrict",
+    })
+    .notNull(),
   codeNumber: varchar("code_number", { length: 50 })
     .references(() => customers.codeNumber)
     .notNull(),
@@ -112,6 +117,18 @@ export const receipts = pgTable("receipt", {
   balance: decimal("balance", { precision: 30, scale: 15 }),
   status: receiptStatusEnum("status").notNull().default("Partially Paid"),
   shipped: boolean("shipped").default(false).notNull(),
+  costPerKgExchangeRate: decimal("cost_per_kg_exchange_rate", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  paymentCurrencyExchangeRate: decimal("payment_currency_xxchange_rate", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  usdExchangeRate: decimal("usd_exchange_rate", {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
   received: boolean("received").default(false).notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
@@ -131,4 +148,13 @@ export const receiptsRelations = relations(receipts, ({ one }) => ({
     fields: [receipts.codeNumber],
     references: [customers.codeNumber],
   }),
+  staff: one(staffs, {
+    fields: [receipts.customerCareId],
+    references: [staffs.staffId],
+  }),
 }));
+
+export type ReceiptWithRelations = Receipt & {
+  customer: Customer;
+  staff: Staff;
+};

@@ -1,0 +1,1 @@
+ALTER TABLE "receipt" ALTER COLUMN "customer_care_id" SET NOT NULL;
