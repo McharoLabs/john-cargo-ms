@@ -33,7 +33,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({
         duration: 600,
         timingFunction: "linear",
       }}
-      size="lg"
+      size="xl"
       closeOnClickOutside={false}
     >
       {form.values && customer && (
@@ -42,6 +42,25 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({
           <Text ta="center" style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
             Receipt
           </Text>
+
+          <Divider my="sm" />
+
+          {/* Exchange Rates */}
+          <Text ta="center" style={{ fontWeight: "bold" }}>
+            Exchange Rates
+          </Text>
+          <Text>
+            Cost per Kg Exchange Rate:{" "}
+            {formatMoney(form.values.costPerKgExchangeRate)} TZS
+          </Text>
+          <Text>
+            Payment Currency Exchange Rate:{" "}
+            {formatMoney(form.values.paymentCurrencyExchangeRate)} TZS
+          </Text>
+          <Text>
+            USD Exchange Rate: {formatMoney(form.values.usdExchangeRate)} TZS
+          </Text>
+
           <Divider my="sm" />
 
           {/* Receipt Information */}
@@ -67,6 +86,14 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({
                   : "N/A"}
               </Text>
               <Text ta="right">
+                Total cost:{" "}
+                {form.values.totalCost
+                  ? `${formatMoney(Number(form.values.totalCost))} ${
+                      form.values.costPerKgCurrency
+                    }`
+                  : "N/A"}
+              </Text>
+              <Text ta="right">
                 Amount Paid:{" "}
                 {form.values.amountPaid
                   ? `${formatMoney(Number(form.values.amountPaid))} ${
@@ -77,9 +104,7 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({
               <Text ta="right">
                 Outstanding:{" "}
                 {form.values.outstanding
-                  ? `${formatMoney(Number(form.values.outstanding))} ${
-                      form.values.paymentCurrency
-                    }`
+                  ? `${formatMoney(Number(form.values.outstanding))} TZS`
                   : "N/A"}
               </Text>
             </Grid.Col>
@@ -110,13 +135,19 @@ const ReceiptModal: React.FC<ReceiptModalProps> = ({
               <Text ta="right">
                 Credit Amount:{" "}
                 {form.values.creditAmount
-                  ? `${formatMoney(Number(form.values.creditAmount))}`
+                  ? `${formatMoney(Number(form.values.creditAmount))} TZS`
+                  : "N/A"}
+              </Text>
+              <Text ta="right">
+                Outstanding:{" "}
+                {form.values.outstanding
+                  ? `${formatMoney(Number(form.values.outstanding))} TZS`
                   : "N/A"}
               </Text>
               <Text ta="right">
                 Balance:{" "}
                 {form.values.balance
-                  ? `${formatMoney(Number(form.values.balance))}`
+                  ? `${formatMoney(Number(form.values.balance))} TZS`
                   : "N/A"}
               </Text>
             </Grid.Col>

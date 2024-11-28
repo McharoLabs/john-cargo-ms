@@ -1,5 +1,5 @@
-export const PaymentStatusEnum = {
-  UNPAID: "Paid",
-  PARTIAALY_PAID: "Partially Paid",
-  PAID: "Unpaid",
-};
+export enum PaymentStatusEnum {
+  UNPAID = "UNPAID",
+  PAID = "PAID",
+  PARTIAALY_PAID = "Partially Paid",
+}

@@ -26,13 +26,17 @@ export const createReceipt = async (input: ReceiptSchemaType) => {
       .values({
         codeNumber: input.codeNumber,
         costPerKg: String(input.costPerKg),
-        costPerKgCurrency: String(input.costPerKgCurrency),
-        paymentCurrency: input.paymentCurrency,
+        costPerKgCurrency: input.costPerKgCurrency
+          ? String(input.costPerKgCurrency)
+          : "",
+        paymentCurrency: input.paymentCurrency
+          ? String(input.paymentCurrency)
+          : "",
         postingDate: new Date(String(input.postingDate)),
+        totalBox: Number(input.totalBox),
         totalPaidInTzs: String(input.totalPaidInTzs),
         totalPaidInUsd: String(input.totalPaidInUsd),
         totalShipmentTshs: String(input.totalShipmentTshs),
-        totalBox: Number(input.totalBox),
         totalShipmentUSD: String(input.totalShipmentUSD),
         totalWeight: String(input.totalWeight),
         balance: input.balance ? String(input.balance) : null,
@@ -91,7 +95,6 @@ export const receiptBasicCalculations = async ({
 }) => {
   let costPerKgRateToTzs: string = "1";
   let amountPaidRateToTzs: string = "1";
-  console.log("Clicked");
   // Convert cost per kg to TZS if it's not already in TZS
   if (costPerKgCurrency !== BaseCurrencyEnum.TZS) {
     const costData = await getCurrency({ currency_code: costPerKgCurrency });
@@ -162,17 +165,18 @@ export const receiptBasicCalculations = async ({
 
     return {
       data: {
+        totalCost,
         totalShipmentTshs,
         totalPaidInTzs,
         totalShipmentUSD,
         totalPaidInUsd,
         status,
         balance,
-        creditAmount,
+        creditAmount: creditAmount ? Number(creditAmount) : null,
         outstanding,
-        costPerKgExchangeRate: costPerKgRateToTzs,
-        paymentCurrencyExchangeRate: amountPaidRateToTzs,
-        usdExchangeRate: usdToTzsRate,
+        costPerKgExchangeRate: Number(costPerKgRateToTzs),
+        paymentCurrencyExchangeRate: Number(amountPaidRateToTzs),
+        usdExchangeRate: Number(usdToTzsRate),
       },
     };
   } catch (error) {

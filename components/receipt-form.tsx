@@ -12,11 +12,8 @@ import {
   Box,
   LoadingOverlay,
 } from "@mantine/core";
-import { useForm, zodResolver } from "@mantine/form";
-import {
-  ReceiptSchema,
-  ReceiptSchemaType,
-} from "@/lib/z-schema/receipt.schema";
+import { isNotEmpty, useForm } from "@mantine/form";
+import { ReceiptSchemaType } from "@/lib/z-schema/receipt.schema";
 import {
   showLoadingNotification,
   updateErrorNotification,
@@ -41,33 +38,59 @@ const ReceiptForm = () => {
   const [loadingExtraData, setLoadingExtraData] =
     React.useState<boolean>(false);
   const [customers, setCustomers] = React.useState<Customer[]>([]);
-  const [selectedCustomer, setSelectedCustomer] = React.useState("");
   const [currencies, setCurrencies] = React.useState<Currency[]>([]);
-  const [selectedCPKCurrency, setSelectedCPKCurrency] = React.useState("");
-  const [selectedPCurrency, setSelectedPCurrency] = React.useState("");
 
   const form = useForm<ReceiptSchemaType>({
+    name: "receipt-form",
+    mode: "controlled",
     initialValues: {
+      customerName: null,
       codeNumber: "",
       postingDate: null,
-      totalBox: null,
-      totalWeight: null,
-      costPerKg: null,
-      costPerKgCurrency: "",
-      totalShipmentUSD: null,
-      totalShipmentTshs: null,
-      amountPaid: null,
-      totalPaidInTzs: null,
-      totalPaidInUsd: null,
-      paymentCurrency: "",
+      totalBox: "",
+      totalWeight: "",
+      costPerKg: "",
+      costPerKgCurrency: null,
+      amountPaid: "",
+      paymentCurrency: null,
       status: PaymentStatusEnum.UNPAID,
       shipped: false,
       received: false,
+      totalPaidInTzs: null,
+      totalPaidInUsd: null,
+      totalShipmentUSD: null,
+      totalShipmentTshs: null,
       creditAmount: null,
       balance: null,
       outstanding: null,
+      totalCost: null,
+      costPerKgExchangeRate: 0,
+      paymentCurrencyExchangeRate: 0,
+      usdExchangeRate: 0,
     },
-    validate: zodResolver(ReceiptSchema),
+    validate: {
+      customerName: isNotEmpty("Please select customer"),
+      postingDate: isNotEmpty("Posting date is required"),
+      totalBox: isNotEmpty("Total box is required"),
+      totalWeight: isNotEmpty("Total weight is required"),
+      costPerKg: isNotEmpty("Cost per kg is required"),
+      costPerKgCurrency: isNotEmpty("Cost currency is required"),
+      amountPaid: isNotEmpty("Amount paid is required"),
+      paymentCurrency: isNotEmpty("Payment currency is required"),
+    },
+  });
+
+  form.watch("customerName", ({ value }) => {
+    console.log(value);
+    const customer = customers.find(
+      (cust) => `${cust.firstName} ${cust.lastName}` === value
+    );
+    console.log(customer);
+    if (customer) {
+      form.setFieldValue("codeNumber", customer.codeNumber);
+    } else {
+      form.setFieldValue("codeNumber", "");
+    }
   });
 
   React.useEffect(() => {
@@ -75,59 +98,24 @@ const ReceiptForm = () => {
   }, []);
 
   React.useEffect(() => {
-    if (form.values.paymentCurrency.length > 0) {
-      const selectedData = currencies.find(
-        (c) => c.currency_code === form.values.paymentCurrency
-      );
-      if (selectedData) {
-        setSelectedPCurrency(selectedData.currency_code);
-      }
-    }
-  }, [currencies, form.values.paymentCurrency]);
-
-  React.useEffect(() => {
-    if (form.values.costPerKgCurrency.length > 0) {
-      const selectedData = currencies.find(
-        (c) => c.currency_code === form.values.costPerKgCurrency
-      );
-      if (selectedData) {
-        setSelectedCPKCurrency(selectedData.currency_code);
-      }
-    }
-  }, [currencies, form.values.costPerKgCurrency]);
-
-  React.useEffect(() => {
-    if (form.values.codeNumber.length > 0) {
-      const selectedData = customers.find(
-        (c) => c.codeNumber === form.values.codeNumber
-      );
-
-      if (selectedData) {
-        setSelectedCustomer(
-          `${selectedData.firstName} ${selectedData.lastName}`
-        );
-      }
-    }
-  }, [customers, form.values.codeNumber]);
-
-  React.useEffect(() => {
     fetchAllCustomers();
   }, []);
 
-  const handleSubmit = async (values: ReceiptSchemaType) => {
-    console.log("Clicked");
+  const handleSubmit = async (values: typeof form.values) => {
     try {
       setLoadingExtraData(true);
       const extraData = await receiptBasicCalculations({
         codeNumber: form.values.codeNumber,
-        totalBox: form.values.totalBox ? Number(form.values.totalBox) : 0,
-        totalWeight: form.values.totalWeight
-          ? Number(form.values.totalWeight)
-          : 0,
-        costPerKg: form.values.costPerKg ? Number(form.values.costPerKg) : 1,
-        costPerKgCurrency: form.values.costPerKgCurrency,
-        amountPaid: form.values.amountPaid ? Number(form.values.amountPaid) : 0,
-        paymentCurrency: form.values.paymentCurrency,
+        totalBox: Number(form.values.totalBox),
+        totalWeight: Number(form.values.totalWeight),
+        costPerKg: Number(form.values.costPerKg),
+        costPerKgCurrency: form.values.costPerKgCurrency
+          ? form.values.costPerKgCurrency
+          : "",
+        amountPaid: Number(form.values.amountPaid),
+        paymentCurrency: form.values.paymentCurrency
+          ? form.values.paymentCurrency
+          : "",
       });
 
       if (extraData.issues) {
@@ -156,15 +144,6 @@ const ReceiptForm = () => {
       //   totalPaidInUsd: extraData.data.totalPaidInUsd,
       // });
 
-      // form.setFieldValue("balance", extraData.data.balance);
-      // form.setFieldValue("creditAmount", extraData.data.creditAmount);
-      // form.setFieldValue("outstanding", extraData.data.outstanding);
-      // form.setFieldValue("totalShipmentTshs", extraData.data.totalShipmentTshs);
-      // form.setFieldValue("totalShipmentUSD", extraData.data.totalShipmentUSD);
-      // form.setFieldValue("status", extraData.data.status);
-      // form.setFieldValue("totalPaidInTzs", extraData.data.totalPaidInTzs);
-      // form.setFieldValue("totalPaidInUsd", extraData.data.totalPaidInUsd);
-
       setTimeout(() => {
         open();
       }, 1000);
@@ -186,14 +165,13 @@ const ReceiptForm = () => {
     showLoadingNotification(notificationProps);
     try {
       const result = await createReceipt(form.values);
-      console.log(result);
       if (result.success) {
         updateSuccessNotification({
           ...notificationProps,
           title: "Form submitted successfully",
           message: "Your data has been saved!",
         });
-        resetForm();
+        form.reset();
       } else if (result.issues) {
         result.issues.forEach((issue) => {
           form.setFieldError(
@@ -243,18 +221,6 @@ const ReceiptForm = () => {
     }
   };
 
-  const handleCloseModal = () => {
-    close();
-    resetForm();
-  };
-
-  const resetForm = () => {
-    form.reset();
-    setSelectedCustomer("");
-    setSelectedCPKCurrency("");
-    setSelectedPCurrency("");
-  };
-
   const dateParser: DateInputProps["dateParser"] = (input) => {
     if (input === "WW2") {
       return new Date(1939, 8, 1);
@@ -266,7 +232,7 @@ const ReceiptForm = () => {
     <div>
       <ReceiptModal
         opened={opened}
-        close={handleCloseModal}
+        close={close}
         confirm={confirm}
         form={form}
         customers={customers}
@@ -288,31 +254,14 @@ const ReceiptForm = () => {
                 <Select
                   label="Customer"
                   placeholder="Select Customer"
-                  required
                   data={customers.map((c) => `${c.firstName} ${c.lastName}`)}
                   searchable
                   clearable
-                  value={selectedCustomer}
-                  error={form.errors.codeNumber}
-                  onChange={(value) => {
-                    if (value) {
-                      const selectedData = customers.find(
-                        (c) => `${c.firstName} ${c.lastName}` === value
-                      );
-
-                      form.setFieldValue(
-                        "codeNumber",
-                        selectedData?.codeNumber || ""
-                      );
-                      setSelectedCustomer(
-                        `${selectedData?.firstName} ${selectedData?.lastName}` ||
-                          ""
-                      );
-                    } else {
-                      form.setFieldValue("codeNumber", "");
-                      setSelectedCustomer("");
-                    }
-                  }}
+                  value={form.values.customerName}
+                  error={form.errors.customerName}
+                  onChange={(value) =>
+                    form.setFieldValue("customerName", value)
+                  }
                 />
               </Grid.Col>
 
@@ -320,15 +269,12 @@ const ReceiptForm = () => {
                 <DateInput
                   label="Posting Date"
                   placeholder="Enter posting date (YYYY-MM-DD)"
-                  required
                   clearable
                   valueFormat="YYYY-MM-DD"
                   dateParser={dateParser}
                   value={form.values.postingDate}
                   error={form.errors.postingDate}
-                  onChange={(value) => {
-                    form.setFieldValue("postingDate", value);
-                  }}
+                  onChange={(value) => form.setFieldValue("postingDate", value)}
                 />
               </Grid.Col>
 
@@ -336,8 +282,11 @@ const ReceiptForm = () => {
                 <NumberInput
                   label="Total Box"
                   placeholder="Enter total box count"
-                  required
-                  {...form.getInputProps("totalBox")}
+                  thousandSeparator=","
+                  min={0}
+                  value={form.values.totalBox}
+                  error={form.errors.totalBox}
+                  onChange={(value) => form.setFieldValue("totalBox", value)}
                 />
               </Grid.Col>
 
@@ -345,9 +294,11 @@ const ReceiptForm = () => {
                 <NumberInput
                   label="Total Weight"
                   placeholder="Enter total weight"
-                  required
-                  step={0.01}
-                  {...form.getInputProps("totalWeight")}
+                  thousandSeparator=","
+                  min={0}
+                  value={form.values.totalWeight}
+                  error={form.errors.totalWeight}
+                  onChange={(value) => form.setFieldValue("totalWeight", value)}
                 />
               </Grid.Col>
 
@@ -355,9 +306,10 @@ const ReceiptForm = () => {
                 <NumberInput
                   label="Cost per Kg"
                   placeholder="Enter cost per kg"
-                  required
-                  step={0.01}
-                  {...form.getInputProps("costPerKg")}
+                  min={0}
+                  value={form.values.costPerKg}
+                  error={form.errors.costPerKg}
+                  onChange={(value) => form.setFieldValue("costPerKg", value)}
                 />
               </Grid.Col>
 
@@ -368,25 +320,11 @@ const ReceiptForm = () => {
                   data={currencies.map((c) => c.currency_code)}
                   searchable
                   clearable
-                  value={selectedCPKCurrency}
+                  value={form.values.costPerKgCurrency}
                   error={form.errors.costPerKgCurrency}
-                  onChange={(value) => {
-                    if (value) {
-                      const selectedData = currencies.find(
-                        (d) => d.currency_code === value
-                      );
-
-                      form.setFieldValue(
-                        "costPerKgCurrency",
-                        selectedData?.currency_code || ""
-                      );
-
-                      setSelectedCPKCurrency(selectedData?.currency_code || "");
-                    } else {
-                      form.setFieldValue("costPerKgCurrency", "");
-                      setSelectedCPKCurrency("");
-                    }
-                  }}
+                  onChange={(value) =>
+                    form.setFieldValue("costPerKgCurrency", value)
+                  }
                 />
               </Grid.Col>
 
@@ -394,9 +332,10 @@ const ReceiptForm = () => {
                 <NumberInput
                   label="Amount Paid"
                   placeholder="Enter amount paid"
-                  required
-                  step={0.01}
-                  {...form.getInputProps("amountPaid")}
+                  min={0}
+                  value={form.values.amountPaid}
+                  error={form.errors.amountPaid}
+                  onChange={(value) => form.setFieldValue("amountPaid", value)}
                 />
               </Grid.Col>
 
@@ -407,25 +346,11 @@ const ReceiptForm = () => {
                   data={currencies.map((c) => c.currency_code)}
                   searchable
                   clearable
-                  value={selectedPCurrency}
-                  error={form.errors.costPerKgCurrency}
-                  onChange={(value) => {
-                    if (value) {
-                      const selectedData = currencies.find(
-                        (d) => d.currency_code === value
-                      );
-
-                      form.setFieldValue(
-                        "paymentCurrency",
-                        selectedData?.currency_code || ""
-                      );
-
-                      setSelectedPCurrency(selectedData?.currency_code || "");
-                    } else {
-                      form.setFieldValue("paymentCurrency", "");
-                      setSelectedPCurrency("");
-                    }
-                  }}
+                  value={form.values.paymentCurrency}
+                  error={form.errors.paymentCurrency}
+                  onChange={(value) =>
+                    form.setFieldValue("paymentCurrency", value)
+                  }
                 />
               </Grid.Col>
             </Grid>
