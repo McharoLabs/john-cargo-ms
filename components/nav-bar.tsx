@@ -27,6 +27,7 @@ export function NavbarNested() {
         ]
       : []),
     { label: "Receipts", icon: IconReceipt, link: "/home/receipts" },
+    { label: "Currency", icon: IconReceipt, link: "/home/currency" },
     {
       label: "Security",
       icon: IconLock,

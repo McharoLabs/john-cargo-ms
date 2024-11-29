@@ -57,6 +57,13 @@
       "when": 1732823388928,
       "tag": "0007_shocking_lionheart",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1732914723095,
+      "tag": "0008_special_bloodscream",
+      "breakpoints": true
     }
   ]
 }

@@ -12,9 +12,12 @@ import {
 } from "./notificationUtils";
 import { create } from "@/actions/customer.server.action";
 import { Button, Grid, Paper, TextInput, Title } from "@mantine/core";
+import { useDispatch } from "react-redux";
+import { appendCustomer } from "@/app/GlobalRedux/Features/customer/customerSlice";
 
 const CustomerForm = () => {
   const [isLoading, setIsLoading] = React.useState(false);
+  const dispatch = useDispatch();
 
   // Initialize form with validation
   const form = useForm<CustomerSchemaType>({
@@ -47,6 +50,9 @@ const CustomerForm = () => {
           title: "Form submitted successfully",
           message: "Your data has been saved!",
         });
+        if (result.data) {
+          dispatch(appendCustomer(result.data));
+        }
         form.reset();
       } else if (result.issues) {
         result.issues.forEach((issue) => {

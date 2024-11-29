@@ -3,34 +3,31 @@ import React from "react";
 import cx from "clsx";
 import { ActionIcon, Menu, rem, ScrollArea, Table, Title } from "@mantine/core";
 import classes from "../style/TableScrollArea.module.css";
-import { ReceiptWithRelations } from "@/db/schema";
-import { getAllReceipts } from "@/actions/receipt.server.action";
 import { IconActivity, IconCreditCardPay, IconEye } from "@tabler/icons-react";
 import { formatMoney } from "@/lib/utils/functions";
 import ReceiptModalDetails from "./receipt-modal-details";
 import { useDisclosure } from "@mantine/hooks";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/app/GlobalRedux/store";
+import { fetchReceipts } from "@/app/GlobalRedux/Features/receipt/receiptSlice";
+import { ReceiptWithRelations } from "@/db/schema";
 
 const ReceiptTable = () => {
   const [opened, { open, close }] = useDisclosure(false);
-
-  const [scrolled, setScrolled] = React.useState<boolean>(false);
-  const [receipts, setReceipts] = React.useState<ReceiptWithRelations[]>([]);
   const [receipt, setReceipt] = React.useState<ReceiptWithRelations | null>(
     null
   );
+  const [scrolled, setScrolled] = React.useState<boolean>(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const { receipts, loading, error } = useSelector(
+    (state: RootState) => state.receipt
+  );
 
   React.useEffect(() => {
-    fetchAllReceipts();
-  }, []);
-
-  const fetchAllReceipts = async () => {
-    try {
-      const result = await getAllReceipts();
-      setReceipts(result);
-    } catch (error) {
-      console.error(error);
+    if (receipts.length === 0) {
+      dispatch(fetchReceipts());
     }
-  };
+  }, [receipts.length, dispatch]);
 
   const rows = receipts.map((row, index) => (
     <Table.Tr key={index}>
@@ -137,7 +134,7 @@ const ReceiptTable = () => {
               <Table.Th>Action</Table.Th>
             </Table.Tr>
           </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
+          <Table.Tbody>{!loading && !error && rows}</Table.Tbody>
         </Table>
       </ScrollArea>
     </div>

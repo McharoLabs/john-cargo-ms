@@ -5,6 +5,7 @@ import "@mantine/notifications/styles.css";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import { appConfig } from "@/config/app.config";
 import { Notifications } from "@mantine/notifications";
+import { Providers } from "./GlobalRedux/provider";
 
 export const metadata: Metadata = {
   title: appConfig.appName,
@@ -24,7 +25,7 @@ export default function RootLayout({
       <body>
         <MantineProvider defaultColorScheme="dark">
           <Notifications limit={5} position="bottom-left" autoClose={400} />
-          {children}
+          <Providers>{children}</Providers>
         </MantineProvider>
       </body>
     </html>

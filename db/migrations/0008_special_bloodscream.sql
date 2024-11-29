@@ -1,0 +1,1 @@
+ALTER TABLE "staffs" ALTER COLUMN "password" SET NOT NULL;

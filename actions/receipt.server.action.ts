@@ -30,8 +30,6 @@ export const createReceipt = async (input: ReceiptSchemaType) => {
       return { success: false, detail: "User is not authenticated" };
     }
 
-    console.debug(`Staff creating customer: ${JSON.stringify(staff)}`);
-
     const savedReceipt = await db
       .insert(receipts)
       .values({
@@ -65,7 +63,23 @@ export const createReceipt = async (input: ReceiptSchemaType) => {
 
     console.info(`Saved Receipt: ${savedReceipt}`);
 
-    return { success: true, detail: "Receipt created successfully." };
+    const data: ReceiptWithRelations | undefined = await getReceipt({
+      receiptId: savedReceipt[0].receiptId,
+    });
+
+    if (data) {
+      return {
+        success: true,
+        detail: "Receipt created successfully.",
+        data: data,
+      };
+    }
+
+    return {
+      success: true,
+      detail: "Receipt created successfully.",
+      data: null,
+    };
   } catch (error) {
     console.error(`Error while creating new receipt: ${error}`);
     throw error;
@@ -92,6 +106,27 @@ export const getAllReceipts = async (
   }
 };
 
+export const getReceipt = async ({
+  receiptId,
+}: {
+  receiptId: string;
+}): Promise<ReceiptWithRelations | undefined> => {
+  try {
+    const receipt = await db.query.receipts.findFirst({
+      with: {
+        customer: true,
+        staff: true,
+      },
+      where: eq(receipts.receiptId, receiptId),
+    });
+
+    return receipt;
+  } catch (error) {
+    console.error(`Error while getting all receipts: ${error}`);
+    throw error;
+  }
+};
+
 const getCustomerLastReceipt = async ({
   codeNumber,
 }: {
@@ -104,7 +139,6 @@ const getCustomerLastReceipt = async ({
       .where(eq(receipts.codeNumber, codeNumber))
       .orderBy(desc(receipts.createdAt))
       .limit(1);
-    console.info(`Customer Last Receipt: ${JSON.stringify(result[0])}`);
     return result[0];
   } catch (error) {
     console.error(`Error while getting customer last balance: ${error}`);

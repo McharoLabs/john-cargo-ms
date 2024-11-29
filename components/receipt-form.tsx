@@ -31,8 +31,11 @@ import { getCurrencies } from "@/actions/currency.server.action";
 import { PaymentStatusEnum } from "@/lib/enum/payment-status-enum";
 import { useDisclosure } from "@mantine/hooks";
 import ReceiptModal from "./receipt-modal";
+import { useDispatch } from "react-redux";
+import { appendReceipt } from "@/app/GlobalRedux/Features/receipt/receiptSlice";
 
 const ReceiptForm = () => {
+  const dispatch = useDispatch();
   const [opened, { open, close }] = useDisclosure(false);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [loadingExtraData, setLoadingExtraData] =
@@ -171,6 +174,9 @@ const ReceiptForm = () => {
           title: "Form submitted successfully",
           message: "Your data has been saved!",
         });
+        if (result.data) {
+          dispatch(appendReceipt(result.data));
+        }
         form.reset();
       } else if (result.issues) {
         result.issues.forEach((issue) => {

@@ -9,8 +9,11 @@ import {
   updateErrorNotification,
   updateSuccessNotification,
 } from "./notificationUtils";
+import { useDispatch } from "react-redux";
+import { appendStaff } from "@/app/GlobalRedux/Features/staff/staffSlice";
 
 function StaffFormPage() {
+  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = React.useState(false);
 
   // Initialize form with validation
@@ -44,6 +47,9 @@ function StaffFormPage() {
           title: "Form submitted successfully",
           message: "Your data has been saved!",
         });
+        if (result.data) {
+          dispatch(appendStaff(result.data));
+        }
         form.reset();
       } else if (result.issues) {
         result.issues.forEach((issue) => {

@@ -1,7 +1,12 @@
-import React from "react";
+import ChangePasswordForm from "@/components/change-password-form";
+import { Container } from "@mantine/core";
 
 const ChangePasswordPage = () => {
-  return <div>ChangePasswordPage</div>;
+  return (
+    <Container size={420} my={40}>
+      <ChangePasswordForm />
+    </Container>
+  );
 };
 
 export default ChangePasswordPage;

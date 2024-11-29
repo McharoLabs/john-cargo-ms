@@ -1,28 +1,26 @@
 "use client";
+
 import React from "react";
 import cx from "clsx";
 import { ScrollArea, Table, Title } from "@mantine/core";
-import classes from "../style/TableScrollArea.module.css";
-import { Currency } from "@/db/schema";
-import { getCurrencies } from "@/actions/currency.server.action";
 import { formatDateToYYYYMMDD } from "@/lib/utils/functions";
+import classes from "../style/TableScrollArea.module.css";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCurrencies } from "@/app/GlobalRedux/Features/currency/currencySlice";
+import { AppDispatch, RootState } from "@/app/GlobalRedux/store";
 
 const CurrencyConversionTable = () => {
   const [scrolled, setScrolled] = React.useState<boolean>(false);
-  const [currencies, setCurrencies] = React.useState<Currency[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  const { currencies, loading, error } = useSelector(
+    (state: RootState) => state.currency
+  );
 
   React.useEffect(() => {
-    fetchCurrencies();
-  }, []);
-
-  const fetchCurrencies = async () => {
-    try {
-      const result = await getCurrencies();
-      setCurrencies(result);
-    } catch (error) {
-      console.error(error);
+    if (currencies.length === 0) {
+      dispatch(fetchCurrencies());
     }
-  };
+  }, [currencies.length, dispatch]);
 
   const rows = currencies.map((row, index) => (
     <Table.Tr key={index}>
@@ -40,6 +38,7 @@ const CurrencyConversionTable = () => {
       <Title ta="start" mb="lg" size={24}>
         Currency Conversion Rates
       </Title>
+
       <ScrollArea
         h={300}
         onScrollPositionChange={({ y }) => setScrolled(y !== 0)}
@@ -57,7 +56,7 @@ const CurrencyConversionTable = () => {
               <Table.Th>Updated At</Table.Th>
             </Table.Tr>
           </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
+          <Table.Tbody>{!loading && !error && rows}</Table.Tbody>
         </Table>
       </ScrollArea>
     </div>

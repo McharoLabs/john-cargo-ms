@@ -3,26 +3,23 @@ import React from "react";
 import cx from "clsx";
 import { ScrollArea, Table, Title } from "@mantine/core";
 import classes from "../style/TableScrollArea.module.css";
-import { Staff } from "@/db/schema";
-import { getAll } from "@/actions/staff.server.action";
 import { formatDateToYYYYMMDD } from "@/lib/utils/functions";
+import { AppDispatch, RootState } from "@/app/GlobalRedux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchStaffs } from "@/app/GlobalRedux/Features/staff/staffSlice";
 
 const StaffTable = () => {
   const [scrolled, setScrolled] = React.useState<boolean>(false);
-  const [staffs, setStaffs] = React.useState<Staff[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  const { staffs, loading, error } = useSelector(
+    (state: RootState) => state.staff
+  );
 
   React.useEffect(() => {
-    getAllStaff();
-  }, []);
-
-  const getAllStaff = async () => {
-    try {
-      const result = await getAll();
-      setStaffs(result);
-    } catch (error) {
-      console.error(error);
+    if (staffs.length === 0) {
+      dispatch(fetchStaffs());
     }
-  };
+  }, [staffs.length, dispatch]);
 
   const rows = staffs.map((row, index) => (
     <Table.Tr key={index}>
@@ -57,7 +54,7 @@ const StaffTable = () => {
               <Table.Th>Created At</Table.Th>
             </Table.Tr>
           </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
+          <Table.Tbody>{!loading && !error && rows}</Table.Tbody>
         </Table>
       </ScrollArea>
     </div>

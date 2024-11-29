@@ -4,25 +4,22 @@ import { ScrollArea, Table, Title } from "@mantine/core";
 import classes from "../style/TableScrollArea.module.css";
 import cx from "clsx";
 import React from "react";
-import { Customer } from "@/db/schema";
-import { getAllCustomers } from "@/actions/customer.server.action";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/app/GlobalRedux/store";
+import { fetchCustomers } from "@/app/GlobalRedux/Features/customer/customerSlice";
 
 const CustomerTable = () => {
   const [scrolled, setScrolled] = React.useState<boolean>(false);
-  const [customers, setCustomers] = React.useState<Customer[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  const { customers, loading, error } = useSelector(
+    (state: RootState) => state.customer
+  );
 
   React.useEffect(() => {
-    getAllSCustomers();
-  }, []);
-
-  const getAllSCustomers = async () => {
-    try {
-      const result = await getAllCustomers();
-      setCustomers(result);
-    } catch (error) {
-      console.error(error);
+    if (customers.length === 0) {
+      dispatch(fetchCustomers());
     }
-  };
+  }, [customers.length, dispatch]);
 
   const rows = customers.map((row, index) => (
     <Table.Tr key={index}>
@@ -61,7 +58,7 @@ const CustomerTable = () => {
               <Table.Th>Created At</Table.Th>
             </Table.Tr>
           </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
+          <Table.Tbody>{!loading && !error && rows}</Table.Tbody>
         </Table>
       </ScrollArea>
     </div>

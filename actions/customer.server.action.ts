@@ -18,7 +18,7 @@ export const create = async (input: CustomerSchemaType) => {
     const result = CustomerSchema.safeParse(input);
 
     if (!result.success) {
-      return { success: false, issues: result.error.issues };
+      return { success: false, issues: result.error.issues, data: null };
     }
 
     const existingCustomer = await db.query.customers.findFirst({
@@ -31,7 +31,7 @@ export const create = async (input: CustomerSchemaType) => {
         message: `Customer with contact ${input.contact} exists`,
         path: ["contact"],
       });
-      return { success: false, issues: zodError.errors };
+      return { success: false, issues: zodError.errors, data: null };
     }
 
     const staff = await auth();
@@ -41,14 +41,12 @@ export const create = async (input: CustomerSchemaType) => {
       return { success: false, detail: "User is not authenticated" };
     }
 
-    console.debug(`Staff creating customer: ${JSON.stringify(staff)}`);
-
     const codeNumber = await generateCustomerCode();
 
     input.addedBy = staff.user.id;
     input.codeNumber = codeNumber;
 
-    const customer = await db
+    const data: Customer[] = await db
       .insert(customers)
       .values({
         firstName: input.firstName,
@@ -60,15 +58,14 @@ export const create = async (input: CustomerSchemaType) => {
         addedBy: staff.user.id,
         codeNumber: codeNumber,
       })
-      .returning({ codeNumber: customers.codeNumber });
+      .returning();
 
-    console.info(`Customer created successful: ${JSON.stringify(customer)}`);
-
-    return { success: true, detail: "Customer added successfully" };
+    return {
+      success: true,
+      detail: "Customer added successfully",
+      data: data[0],
+    };
   } catch (error) {
-    console.error(
-      `Error while creating customer ${JSON.stringify(input)}: ${error}`
-    );
     throw error;
   }
 };

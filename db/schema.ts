@@ -16,7 +16,7 @@ export const staffs = pgTable("staffs", {
   lastName: varchar("last_name", { length: 50 }).notNull(),
   email: varchar("email", { length: 255 }).unique().notNull(),
   contact: varchar("contact", { length: 50 }).notNull().unique(),
-  password: varchar("password", { length: 255 }),
+  password: varchar("password", { length: 255 }).notNull(),
   isSuperUser: boolean("is_super_user").default(false).notNull(),
   department: varchar("department", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow(),

@@ -13,9 +13,12 @@ import {
   updateErrorNotification,
   updateSuccessNotification,
 } from "./notificationUtils";
+import { useDispatch } from "react-redux";
+import { appendCurrency } from "@/app/GlobalRedux/Features/currency/currencySlice";
 
 function CurrencyForm() {
   const [isLoading, setIsLoading] = React.useState(false);
+  const dispatch = useDispatch();
 
   const form = useForm<CurrencySchemaType>({
     initialValues: {
@@ -47,6 +50,9 @@ function CurrencyForm() {
           title: "Currency created successfully",
           message: "Your currency has been added!",
         });
+        if (result.data) {
+          dispatch(appendCurrency(result.data));
+        }
         form.reset();
       } else if (result.issues) {
         result.issues.forEach((issue) => {
