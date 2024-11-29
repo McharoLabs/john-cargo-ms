@@ -1,6 +1,7 @@
 import CurrencyForm from "@/components/currency-form";
 import CurrencyConversionTable from "@/components/currency-table";
-import { Flex } from "@mantine/core";
+import RecentReceiptTable from "@/components/recent-receipt-table";
+import { Flex, Space } from "@mantine/core";
 import React from "react";
 
 const DashboardPage = () => {
@@ -10,6 +11,8 @@ const DashboardPage = () => {
         <CurrencyForm />
         <CurrencyConversionTable />
       </Flex>
+      <Space h={"xl"} />
+      <RecentReceiptTable />
     </div>
   );
 };

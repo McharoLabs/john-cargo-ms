@@ -315,8 +315,8 @@ const ReceiptForm = () => {
 
               <Grid.Col span={{ base: 12, md: 6, lg: 4 }}>
                 <Select
-                  label="Cost Per Ky Currency"
-                  placeholder="Cost Per Ky Currency"
+                  label="Cost Per Kg Currency"
+                  placeholder="Cost Per Kg Currency"
                   data={currencies.map((c) => c.currency_code)}
                   searchable
                   clearable

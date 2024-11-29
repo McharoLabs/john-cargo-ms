@@ -72,7 +72,9 @@ export const createReceipt = async (input: ReceiptSchemaType) => {
   }
 };
 
-export const getAllReceipts = async (): Promise<ReceiptWithRelations[]> => {
+export const getAllReceipts = async (
+  limit?: number
+): Promise<ReceiptWithRelations[]> => {
   try {
     const allReceipts = await db.query.receipts.findMany({
       orderBy: desc(receipts.createdAt),
@@ -80,6 +82,7 @@ export const getAllReceipts = async (): Promise<ReceiptWithRelations[]> => {
         customer: true,
         staff: true,
       },
+      ...(limit !== undefined && { limit }),
     });
 
     return allReceipts;
